@@ -10,10 +10,20 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.close.presentation.auth.AuthNavigationHost
 import com.example.close.ui.theme.CloseTheme
+import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.auth
 
 class MainActivity : ComponentActivity() {
+
+    private  lateinit var auth: FirebaseAuth
+
     override fun onCreate(savedInstanceState: Bundle?) {
+
+        auth = Firebase.auth
+
         super.onCreate(savedInstanceState)
         setContent {
             CloseTheme {
@@ -22,9 +32,22 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    Greeting("Android")
+//                    Greeting("Android")
+
+                    AuthNavigationHost()
                 }
             }
+        }
+    }
+
+
+    override fun onStart() {
+        super.onStart()
+
+        val currentUser = auth.currentUser
+
+        if (currentUser != null){
+            TODO()
         }
     }
 }
