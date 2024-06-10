@@ -1,0 +1,27 @@
+<resources>
+    <string name="app_name">Close</string>
+
+    <string name="sign_in">Sign in</string>
+
+    
+    <string name="sign_up">Sign Up</string>
+    <string name="register">Register</string>
+    <string name="create_account">Create your new account</string>
+    <string name="sign_up_username">Create your username</string>
+    <string name="sign_up_password">Create password</string>
+    <string name="sign_up_confirm_password">Confirm your password</string>
+    <string name="sign_up_email">Your Email Address</string>
+    <string name="have_account">Already have an account?</string>
+    
+    <string name="sign_in_welcome">Welcome Back</string>
+    <string name="sign_in_account">Sign in to your account</string>
+    <string name="username">Username</string>
+    <string name="no_account">Don\'t have account?</string>
+    <string name="icon_person">username icon</string>
+    <string name="icon_email">email icon</string>
+    <string name="email">email</string>
+    <string name="email_placeholder">user@mail.com</string>
+    <string name="password">Password</string>
+    <string name="icon_password">password icon</string>
+
+</resources>
