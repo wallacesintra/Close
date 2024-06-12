@@ -10,7 +10,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.close.presentation.auth.AuthNavigationHost
+import com.example.close.presentation.auth.navigation.AuthNavigationHost
 import com.example.close.ui.theme.CloseTheme
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
@@ -34,22 +34,23 @@ class MainActivity : ComponentActivity() {
                 ) {
 //                    Greeting("Android")
 
-                    AuthNavigationHost()
+                    AuthNavigationHost(auth = auth)
+//                    AuthNavigationHost()
                 }
             }
         }
     }
 
 
-    override fun onStart() {
-        super.onStart()
-
-        val currentUser = auth.currentUser
-
-        if (currentUser != null){
-            TODO()
-        }
-    }
+//    override fun onStart() {
+//        super.onStart()
+//
+//        val currentUser = auth.currentUser
+//
+//        if (currentUser != null){
+//
+//        }
+//    }
 }
 
 @Composable

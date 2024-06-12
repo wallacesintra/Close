@@ -1,4 +1,4 @@
-package com.example.close.presentation.auth
+package com.example.close.presentation.auth.navigation
 
 import androidx.navigation.NamedNavArgument
 

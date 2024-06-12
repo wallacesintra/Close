@@ -24,4 +24,6 @@
     <string name="password">Password</string>
     <string name="icon_password">password icon</string>
 
+    <string name="icon_go_back">Go back</string>
+
 </resources>

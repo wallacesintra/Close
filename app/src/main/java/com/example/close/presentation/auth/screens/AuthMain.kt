@@ -1,4 +1,4 @@
-package com.example.close.presentation.auth
+package com.example.close.presentation.auth.screens
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
