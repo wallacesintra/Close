@@ -1,4 +1,4 @@
-package com.example.close.presentation.auth
+package com.example.close.presentation.auth.screens
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -27,20 +27,29 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.close.R
+import com.example.close.presentation.auth.viewmodel.AuthViewModel
+import com.example.close.presentation.auth.viewmodel.SignInSignUpViewModel
+import com.example.close.presentation.components.GoBack
 
 
-@Preview(showBackground = true, showSystemUi = true)
 @Composable
-fun SignUp(){
+fun SignUp(
+    goBackEvent: () -> Unit,
+    goToSignIn: () -> Unit,
+    authViewModel: AuthViewModel,
+    signInSignUpViewModel: SignInSignUpViewModel
+){
 
     var username by remember {
         mutableStateOf("")
@@ -58,11 +67,30 @@ fun SignUp(){
         mutableStateOf("")
     }
 
+    var passwordsMatch by remember {
+        mutableStateOf(false)
+    }
+
+    var correctEmailFormat by remember {
+        mutableStateOf(false)
+    }
+
+    var passwordVisible by remember {
+        mutableStateOf(false)
+    }
+
     Box(
         modifier = Modifier
             .padding(20.dp)
             .fillMaxSize()
     ) {
+
+        Box(
+            modifier = Modifier.align(Alignment.TopStart)
+        ) {
+            GoBack(goBackEvent = goBackEvent)
+        }
+
         Column(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -81,6 +109,7 @@ fun SignUp(){
             )
             Spacer(modifier = Modifier.height(25.dp))
 
+            //username
 
             TextField(
                 value = username,
@@ -100,9 +129,13 @@ fun SignUp(){
                     .padding(vertical = 10.dp)
             )
 
+            //email field
             TextField(
                 value = email,
-                onValueChange = { email = it },
+                onValueChange = {
+                    email = it
+                    correctEmailFormat = signInSignUpViewModel.isValidEmail(email)
+                                },
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Default.Email,
@@ -113,8 +146,13 @@ fun SignUp(){
                 },
                 placeholder = { Text(text = stringResource(id = R.string.email_placeholder)) },
                 label = {
-                    Text(text = stringResource(id = R.string.sign_up_email))
+                    if (!correctEmailFormat && email != ""){
+                        Text(text = stringResource(id = R.string.email_placeholder))
+                    }else{
+                        Text(text = stringResource(id = R.string.sign_up_email))
+                    }
                 },
+                isError = (!correctEmailFormat && email != ""),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                 modifier = Modifier
                     .fillMaxWidth()
@@ -122,7 +160,7 @@ fun SignUp(){
 
             )
 
-
+            //password
             TextField(
                 value = password,
                 onValueChange = { password = it },
@@ -134,20 +172,37 @@ fun SignUp(){
 
                     )
                 },
+                trailingIcon = {
+                               Icon(
+                                   painter = if (!passwordVisible) painterResource(id = R.drawable.visible) else painterResource(
+                                       id = R.drawable.not_visible
+                                   ),
+                                   contentDescription = stringResource(id = R.string.password_visible),
+                                   modifier = Modifier
+                                       .clickable(
+                                           onClick = { passwordVisible = !passwordVisible}
+                                       )
+                               )
+                },
                 label = {
                     Text(text = stringResource(id = R.string.sign_up_password))
                 },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                visualTransformation = PasswordVisualTransformation(),
+                visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 10.dp)
 
             )
 
+
+            //confirm password
             TextField(
                 value = confirmPassword,
-                onValueChange = { confirmPassword = it },
+                onValueChange = {
+                    confirmPassword = it
+                    passwordsMatch =  signInSignUpViewModel.checkConfirmedPasswordMatch(password, confirmPassword)
+                                },
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Default.Lock,
@@ -156,11 +211,28 @@ fun SignUp(){
 
                     )
                 },
-                label = {
-                    Text(text = stringResource(id = R.string.sign_up_confirm_password))
+                trailingIcon = {
+                    Icon(
+                        painter = if (!passwordVisible) painterResource(id = R.drawable.visible) else painterResource(
+                            id = R.drawable.not_visible
+                        ),
+                        contentDescription = stringResource(id = R.string.password_visible),
+                        modifier = Modifier
+                            .clickable(
+                                onClick = { passwordVisible = !passwordVisible}
+                            )
+                    )
                 },
+                label = {
+                    if (password != "" && confirmPassword != "" && !passwordsMatch){
+                        Text(text = stringResource(id = R.string.dont_match))
+                    }else{
+                        Text(text = stringResource(id = R.string.sign_up_confirm_password))
+                    }
+                },
+                isError = (password != "" && confirmPassword != "" && !passwordsMatch),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                visualTransformation = PasswordVisualTransformation(),
+                visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 10.dp)
@@ -168,7 +240,11 @@ fun SignUp(){
             )
 
             Button(
-                onClick = { /*TODO*/ },
+                onClick = {
+                    if (correctEmailFormat && passwordsMatch){
+                        authViewModel.createNewAccountWithEmailAndPassword(username, email, password)
+                    }
+                          },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(15.dp)
@@ -196,10 +272,18 @@ fun SignUp(){
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.clickable(
-                        onClick = {}
+                        onClick = goToSignIn
                     )
                 )
             }
         }
     }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun SignupPreview(){
+//    SignUp {
+//        {}
+//    }
 }

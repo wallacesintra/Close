@@ -11,8 +11,12 @@
     <string name="sign_up_password">Create password</string>
     <string name="sign_up_confirm_password">Confirm your password</string>
     <string name="sign_up_email">Your Email Address</string>
+    <string name="dont_match">The passwords don\'t match</string>
     <string name="have_account">Already have an account?</string>
-    
+
+    <string name="password_visible">View password</string>
+    <string name="password_not_visible">Hide password</string>
+
     <string name="sign_in_welcome">Welcome Back</string>
     <string name="sign_in_account">Sign in to your account</string>
     <string name="username">Username</string>
@@ -23,5 +27,7 @@
     <string name="email_placeholder">user@mail.com</string>
     <string name="password">Password</string>
     <string name="icon_password">password icon</string>
+
+    <string name="icon_go_back">Go back</string>
 
 </resources>

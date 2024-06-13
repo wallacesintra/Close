@@ -1,4 +1,4 @@
-package com.example.close.utils
+package com.example.close.data.auth
 
 import android.content.Context
 import android.util.Log
@@ -6,19 +6,26 @@ import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 
-class CloseAuth(
+class UserDataSource(
     private val context: Context,
     private val auth: FirebaseAuth
-) {
-    suspend fun createAccount(email: String, password: String): FirebaseUser? {
+): UserSource{
+    override suspend fun createNewAccountWithEmailAndPassword(
+        email: String,
+        username: String,
+        password: String
+    ): FirebaseUser? {
         var user: FirebaseUser? = null
+
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
+                if (task.isSuccessful){
                     //Sign in success
                     Log.d("createUserWithEmail:success", task.toString())
                     user = auth.currentUser
+
                 } else {
+
                     // Sign in fails
                     Log.w("createUserWithEmail:failure", task.exception)
 
@@ -27,25 +34,33 @@ class CloseAuth(
                         "Authentication failed.",
                         Toast.LENGTH_SHORT,
                     ).show()
+
                 }
+
             }
 
         return user
     }
 
-    suspend fun signIn(email: String, password: String) {
+    override suspend fun signInExistingUserWithEmailAndPassword(
+        email: String,
+        password: String
+    ): FirebaseUser? {
+        var user: FirebaseUser? = null
 
         auth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    //sign in successful
+                if (task.isSuccessful){
                     Log.d("signInWithEmail:success", task.toString())
-                    val user = auth.currentUser
+                    user = auth.currentUser
                 } else {
-                    Log.w("signInWithEmail:failure", task.exception)
-                }
-            }
-    }
+                    task.exception?.message?.let { Log.w("signInWithEmail:failure", it) }
 
+                }
+
+            }
+
+        return user
+    }
 
 }
