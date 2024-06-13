@@ -11,6 +11,7 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.close.CloseApp
 import com.example.close.data.auth.UserDataSource
+import com.example.close.presentation.auth.models.AuthState
 import com.example.close.presentation.models.UserData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -19,7 +20,8 @@ class AuthViewModel(
     private val userDataSource: UserDataSource
 ): ViewModel() {
 
-//    var authState: AuthState by mutableStateOf(AuthState())
+    var authState: AuthState by mutableStateOf(AuthState())
+
     var userData by mutableStateOf(UserData())
 
 //    private val _userData = MutableStateFlow(UserData())
@@ -42,6 +44,10 @@ class AuthViewModel(
                 if (userDetails != null){
                     userData = userData.copy(
                         data = userDetails
+                    )
+
+                    authState = authState.copy(
+                        isUserSignedIn = true
                     )
                 }
                 

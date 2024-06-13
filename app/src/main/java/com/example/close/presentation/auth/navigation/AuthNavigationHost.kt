@@ -11,6 +11,7 @@ import com.example.close.presentation.auth.screens.AuthMain
 import com.example.close.presentation.auth.screens.SignIn
 import com.example.close.presentation.auth.screens.SignUp
 import com.example.close.presentation.auth.viewmodel.AuthViewModel
+import com.example.close.presentation.auth.viewmodel.SignInSignUpViewModel
 import com.google.firebase.auth.FirebaseAuth
 
 @Composable
@@ -20,6 +21,9 @@ fun AuthNavigationHost(
     val navController = rememberNavController()
 
     val authViewmodel: AuthViewModel = viewModel(factory = AuthViewModel.Factory)
+    val signInSignUpViewModel: SignInSignUpViewModel = viewModel()
+
+    val authState = authViewmodel.authState
 
     NavHost(
         navController = navController,
@@ -37,8 +41,19 @@ fun AuthNavigationHost(
                 signUpEvent = { navController.navigate(AuthScreens.SignUp.route) }
             )
         }
-        composable(AuthScreens.SignIn.route){ SignIn(authViewModel = authViewmodel, goBackEvent = {navController.popBackStack()}) }
-        composable(AuthScreens.SignUp.route){ SignUp(authViewModel = authViewmodel,goBackEvent = {navController.popBackStack()}) }
+        composable(AuthScreens.SignIn.route){ SignIn(
+            authViewModel = authViewmodel,
+            signInSignUpViewModel = signInSignUpViewModel,
+            goToSignUp = {navController.navigate(AuthScreens.SignUp.route)},
+            goToProfile = {navController.navigate("profile")},
+            goBackEvent = { navController.popBackStack() }
+        )}
+        composable(AuthScreens.SignUp.route){ SignUp(
+            signInSignUpViewModel = signInSignUpViewModel,
+            authViewModel = authViewmodel,
+            goToSignIn = {navController.navigate(AuthScreens.SignIn.route)},
+            goBackEvent = { navController.popBackStack() }
+        ) }
         composable("profile"){ auth.currentUser?.let { it1 -> Profile(it1) } }
     }
 }
