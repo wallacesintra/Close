@@ -10,47 +10,56 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.close.CloseApp
+import com.example.close.data.auth.Resource
 import com.example.close.data.auth.UserDataSource
+import com.example.close.data.database.CloseUserDataSource
 import com.example.close.presentation.auth.models.AuthState
-import com.example.close.presentation.models.UserData
+import com.example.close.presentation.models.CloseUserData
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class AuthViewModel(
-    private val userDataSource: UserDataSource
+    private val userDataSource: UserDataSource,
+    private val closeUserDataSource: CloseUserDataSource
 ): ViewModel() {
 
     var authState: AuthState by mutableStateOf(AuthState())
 
-    var userData by mutableStateOf(UserData())
+    var userData by mutableStateOf(CloseUserData())
 
-//    private val _userData = MutableStateFlow(UserData())
 
-    private fun isValidEmail(email: String): Boolean{
-        val emailRegex = "^[A-Za-z0-9+_.-]+@(.+)$".toRegex()
-        return email.matches(emailRegex)
+
+    suspend fun addToDB(newUser: CloseUserData){
+        closeUserDataSource.addNewCloseUser(newUser)
     }
 
-    fun createNewAccountWithEmailAndPassword(username: String, email: String, password: String){
-        viewModelScope.launch(Dispatchers.IO) {
 
-            if (isValidEmail(email)){
-                val userDetails =userDataSource.createNewAccountWithEmailAndPassword(
-                    email = email,
+    suspend fun createNewAccountWithEmailAndPassword(username: String, email: String, password: String){
+
+        val userDetails =userDataSource.createNewAccountWithEmailAndPassword(
+            email = email,
+            username = username,
+            password = password
+        )
+
+
+        when (userDetails){
+            is Resource.Error -> {}
+            is Resource.Success -> {
+                val user= CloseUserData(
+                    uid = userDetails.data!!.uid,
                     username = username,
-                    password = password
+                    email = userDetails.data.email
                 )
 
-                if (userDetails != null){
-                    userData = userData.copy(
-                        data = userDetails
-                    )
+                closeUserDataSource.addNewCloseUser(newUser = user)
 
-                    authState = authState.copy(
-                        isUserSignedIn = true
-                    )
-                }
-                
+                userData = userData.copy(
+                    uid = user.uid,
+                    username = user.username,
+                    email = user.email
+                )
             }
         }
     }
@@ -61,9 +70,20 @@ class AuthViewModel(
 
             if (userDetails != null){
                 userData = userData.copy(
-                    data = userDetails
+                    uid = userDetails.uid,
+                    email = userDetails.email
                 )
             }
+        }
+    }
+
+    fun signOutUser(){
+        viewModelScope.launch(Dispatchers.IO) {
+            userDataSource.signOutExistingUser()
+
+            authState = authState.copy(
+                isUserSignedIn = false
+            )
         }
     }
 
@@ -73,7 +93,9 @@ class AuthViewModel(
             initializer {
                 val application = (this[APPLICATION_KEY] as CloseApp)
                 val userDataSource = application.container.userDataSource
-                AuthViewModel(userDataSource = userDataSource)
+                val closeUserDataSource = application.container.closeUserDataSource
+
+                AuthViewModel(userDataSource = userDataSource, closeUserDataSource = closeUserDataSource)
             }
         }
     }

@@ -41,15 +41,21 @@ import com.example.close.R
 import com.example.close.presentation.auth.viewmodel.AuthViewModel
 import com.example.close.presentation.auth.viewmodel.SignInSignUpViewModel
 import com.example.close.presentation.components.GoBack
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
 @Composable
 fun SignUp(
     goBackEvent: () -> Unit,
     goToSignIn: () -> Unit,
+    goToProfile: () -> Unit = {},
     authViewModel: AuthViewModel,
     signInSignUpViewModel: SignInSignUpViewModel
 ){
+
+    val scope = CoroutineScope(Dispatchers.Main)
 
     var username by remember {
         mutableStateOf("")
@@ -241,9 +247,14 @@ fun SignUp(
 
             Button(
                 onClick = {
-                    if (correctEmailFormat && passwordsMatch){
-                        authViewModel.createNewAccountWithEmailAndPassword(username, email, password)
+                    scope.launch {
+                        if (correctEmailFormat && passwordsMatch){
+                            authViewModel.createNewAccountWithEmailAndPassword(username, email, password)
+
+                            goToProfile()
+                        }
                     }
+
                           },
                 modifier = Modifier
                     .fillMaxWidth()

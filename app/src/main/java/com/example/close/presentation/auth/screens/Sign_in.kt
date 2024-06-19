@@ -74,12 +74,7 @@ fun SignIn(
 
     if (signInButtonClicked){
         LaunchedEffect(key1 = Unit) {
-            if (correctEmailFormat){
-                authViewModel.signInExistingAccountWithEmailAndPassword(email, password)
-            }
-            if (authViewModel.authState.isUserSignedIn){
-                goToProfile()
-            }
+
         }
     }
 
@@ -182,14 +177,14 @@ fun SignIn(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Button(
-//                    onClick = {
-//                        authViewModel.signInExistingAccountWithEmailAndPassword(email, password)
-//
-//                        if (authViewModel.authState.isUserSignedIn){
-//                            goToProfile()
-//                        }
-//                              },
-                    onClick = {signInButtonClicked = true},
+                    onClick = {
+                        authViewModel.signInExistingAccountWithEmailAndPassword(email, password)
+
+                        if (authViewModel.authState.isUserSignedIn){
+                            goToProfile()
+                        }
+                              },
+//                    onClick = {signInButtonClicked = true},
                     modifier = Modifier
                         .fillMaxWidth()
                 ) {
