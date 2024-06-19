@@ -5,6 +5,8 @@ import android.util.Log
 import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class UserDataSource(
     private val context: Context,
@@ -14,32 +16,38 @@ class UserDataSource(
         email: String,
         username: String,
         password: String
-    ): FirebaseUser? {
-        var user: FirebaseUser? = null
 
-        auth.createUserWithEmailAndPassword(email, password)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful){
-                    //Sign in success
-                    Log.d("createUserWithEmail:success", task.toString())
-                    user = auth.currentUser
+    ): Resource<FirebaseUser> {
+        return withContext(Dispatchers.Main){
+            try {
+                val result =auth.createUserWithEmailAndPassword(email, password)
+                    .addOnCompleteListener { task->
+                        if (task.isSuccessful){
 
-                } else {
+                            Log.d("createUserWithEmail:success", task.toString())
 
-                    // Sign in fails
-                    Log.w("createUserWithEmail:failure", task.exception)
+                        }else{
+                            Log.w("createUserWithEmail:failure", task.exception)
 
-                    Toast.makeText(
-                        context,
-                        "Authentication failed.",
-                        Toast.LENGTH_SHORT,
-                    ).show()
+                            Toast.makeText(
+                                context,
+                                "Authentication failed.",
+                                Toast.LENGTH_SHORT,
+                            ).show()
 
+                        }
+                    }
+
+                if (result.isSuccessful){
+                    Resource.Success(result.result.user)
+                }else{
+                    Resource.Error(result.exception?.message.toString())
                 }
 
+            }catch (exception: Exception){
+                Resource.Error(exception.message ?: "An error occurred")
             }
-
-        return user
+        }
     }
 
     override suspend fun signInExistingUserWithEmailAndPassword(
@@ -55,12 +63,16 @@ class UserDataSource(
                     user = auth.currentUser
                 } else {
                     task.exception?.message?.let { Log.w("signInWithEmail:failure", it) }
-
                 }
 
             }
 
         return user
+    }
+
+    override suspend fun signOutExistingUser() {
+        auth.signOut()
+        Log.d("signOut:success", "sign out successful")
     }
 
 }

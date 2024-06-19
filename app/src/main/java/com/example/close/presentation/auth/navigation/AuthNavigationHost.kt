@@ -13,11 +13,14 @@ import com.example.close.presentation.auth.screens.SignUp
 import com.example.close.presentation.auth.viewmodel.AuthViewModel
 import com.example.close.presentation.auth.viewmodel.SignInSignUpViewModel
 import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 
 @Composable
 fun AuthNavigationHost(
     auth: FirebaseAuth
 ){
+    val scope = CoroutineScope(Dispatchers.Main)
     val navController = rememberNavController()
 
     val authViewmodel: AuthViewModel = viewModel(factory = AuthViewModel.Factory)
@@ -52,8 +55,9 @@ fun AuthNavigationHost(
             signInSignUpViewModel = signInSignUpViewModel,
             authViewModel = authViewmodel,
             goToSignIn = {navController.navigate(AuthScreens.SignIn.route)},
+            goToProfile = {navController.navigate("profile")},
             goBackEvent = { navController.popBackStack() }
         ) }
-        composable("profile"){ auth.currentUser?.let { it1 -> Profile(it1) } }
+        composable("profile"){ auth.currentUser?.let { it1 -> Profile(it1, signOut = {authViewmodel.signOutUser()}) } }
     }
 }

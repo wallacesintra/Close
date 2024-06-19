@@ -15,6 +15,7 @@ import com.example.close.ui.theme.CloseTheme
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
+import com.google.firebase.firestore.firestore
 
 class MainActivity : ComponentActivity() {
 
@@ -32,8 +33,6 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-//                    Greeting("Android")
-
                     AuthNavigationHost(auth = auth)
 //                    AuthNavigationHost()
                 }
@@ -45,7 +44,7 @@ class MainActivity : ComponentActivity() {
 //    override fun onStart() {
 //        super.onStart()
 //
-//        val currentUser = auth.currentUser
+//        val currentUser = auth.currentUser?.providerId
 //
 //        if (currentUser != null){
 //
