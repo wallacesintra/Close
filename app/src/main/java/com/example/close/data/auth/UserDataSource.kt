@@ -6,68 +6,50 @@ import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
+import kotlin.coroutines.resume
+
 
 class UserDataSource(
     private val context: Context,
     private val auth: FirebaseAuth
 ): UserSource{
+
     override suspend fun createNewAccountWithEmailAndPassword(
         email: String,
         username: String,
         password: String
-
-    ): Resource<FirebaseUser> {
-        return withContext(Dispatchers.Main){
-            try {
-                val result =auth.createUserWithEmailAndPassword(email, password)
-                    .addOnCompleteListener { task->
-                        if (task.isSuccessful){
-
-                            Log.d("createUserWithEmail:success", task.toString())
-
-                        }else{
-                            Log.w("createUserWithEmail:failure", task.exception)
-
-                            Toast.makeText(
-                                context,
-                                "Authentication failed.",
-                                Toast.LENGTH_SHORT,
-                            ).show()
-
-                        }
-                    }
-
-                if (result.isSuccessful){
-                    Resource.Success(result.result.user)
-                }else{
-                    Resource.Error(result.exception?.message.toString())
+    ): Resource<FirebaseUser> = withContext(Dispatchers.Main) {
+        suspendCancellableCoroutine { continuation ->
+            auth.createUserWithEmailAndPassword(email, password)
+                .addOnSuccessListener { result ->
+                    Log.d("createAccount: Success", result.user?.email ?: "")
+                    continuation.resume(Resource.Success(result.user!!))
                 }
-
-            }catch (exception: Exception){
-                Resource.Error(exception.message ?: "An error occurred")
-            }
+                .addOnFailureListener { e ->
+                    Log.w("createAccount: Failure", e.message.toString())
+                    continuation.resume(Resource.Error(e.message.toString()))
+                }
         }
     }
 
     override suspend fun signInExistingUserWithEmailAndPassword(
         email: String,
         password: String
-    ): FirebaseUser? {
-        var user: FirebaseUser? = null
-
-        auth.signInWithEmailAndPassword(email, password)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful){
-                    Log.d("signInWithEmail:success", task.toString())
-                    user = auth.currentUser
-                } else {
-                    task.exception?.message?.let { Log.w("signInWithEmail:failure", it) }
+    ): Resource<FirebaseUser> = withContext(Dispatchers.Main) {
+        suspendCancellableCoroutine<Resource<FirebaseUser>> { continuation ->
+            auth.signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        Log.d("signInWithEmail:success", task.toString())
+                        continuation.resume(Resource.Success(task.result!!.user!!))
+                    } else {
+                        task.exception?.message?.let { Log.w("signInWithEmail:failure", it) }
+                        continuation.resume(Resource.Error(task.exception?.message.toString()))
+                    }
                 }
-
-            }
-
-        return user
+        }
     }
 
     override suspend fun signOutExistingUser() {
@@ -76,3 +58,4 @@ class UserDataSource(
     }
 
 }
+

@@ -1,5 +1,6 @@
 package com.example.close.presentation.auth.viewmodel
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -29,50 +30,62 @@ class AuthViewModel(
     var userData by mutableStateOf(CloseUserData())
 
 
-
-    suspend fun addToDB(newUser: CloseUserData){
-        closeUserDataSource.addNewCloseUser(newUser)
-    }
-
-
-    suspend fun createNewAccountWithEmailAndPassword(username: String, email: String, password: String){
-
-        val userDetails =userDataSource.createNewAccountWithEmailAndPassword(
-            email = email,
-            username = username,
-            password = password
-        )
+    fun createNewAccountWithEmailAndPassword(username: String, email: String, password: String){
+        viewModelScope.launch(Dispatchers.IO) {
+            val userDetails =userDataSource.createNewAccountWithEmailAndPassword(
+                email = email,
+                username = username,
+                password = password
+            )
 
 
-        when (userDetails){
-            is Resource.Error -> {}
-            is Resource.Success -> {
-                val user= CloseUserData(
-                    uid = userDetails.data!!.uid,
-                    username = username,
-                    email = userDetails.data.email
-                )
+            when (userDetails){
+                is Resource.Error -> {
 
-                closeUserDataSource.addNewCloseUser(newUser = user)
+                }
+                is Resource.Success -> {
+                    val user= CloseUserData(
+                        uid = userDetails.data!!.uid,
+                        username = username,
+                        email = userDetails.data.email
+                    )
 
-                userData = userData.copy(
-                    uid = user.uid,
-                    username = user.username,
-                    email = user.email
-                )
+                    closeUserDataSource.addNewCloseUser(newUser = user)
+
+                    userData = userData.copy(
+                        uid = user.uid,
+                        username = user.username,
+                        email = user.email
+                    )
+                }
             }
+
         }
+
+
     }
 
     fun signInExistingAccountWithEmailAndPassword(email:String, password: String){
         viewModelScope.launch(Dispatchers.IO) {
+
             val userDetails = userDataSource.signInExistingUserWithEmailAndPassword(email = email, password = password)
 
-            if (userDetails != null){
-                userData = userData.copy(
-                    uid = userDetails.uid,
-                    email = userDetails.email
-                )
+            when (userDetails){
+                is Resource.Error -> {}
+                is Resource.Success -> {
+
+                    val uid = userDetails.data!!.uid
+
+                    val signedInUser =closeUserDataSource.getSignInUser(uid)
+
+                    userData = userData.copy(
+                        uid = signedInUser.uid,
+                        username = signedInUser.username,
+                        email = signedInUser.email
+                    )
+
+
+                }
             }
         }
     }
@@ -84,6 +97,8 @@ class AuthViewModel(
             authState = authState.copy(
                 isUserSignedIn = false
             )
+
+            userData = CloseUserData()
         }
     }
 

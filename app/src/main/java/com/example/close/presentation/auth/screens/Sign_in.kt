@@ -178,11 +178,9 @@ fun SignIn(
             ) {
                 Button(
                     onClick = {
-                        authViewModel.signInExistingAccountWithEmailAndPassword(email, password)
 
-                        if (authViewModel.authState.isUserSignedIn){
-                            goToProfile()
-                        }
+                        authViewModel.signInExistingAccountWithEmailAndPassword(email, password)
+                        goToProfile()
                               },
 //                    onClick = {signInButtonClicked = true},
                     modifier = Modifier

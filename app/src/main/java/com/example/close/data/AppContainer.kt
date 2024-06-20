@@ -4,7 +4,6 @@ import android.content.Context
 import com.example.close.data.auth.UserDataSource
 import com.example.close.data.database.CloseUserDataSource
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.auth
 import com.google.firebase.firestore.FirebaseFirestore
 
 interface AppContainer {
@@ -28,7 +27,6 @@ class DefaultContainer(
 
     override val closeUserDataSource: CloseUserDataSource by lazy {
         CloseUserDataSource(
-            context = applicationContext,
             firestoreDb = firestoreDb
         )
     }

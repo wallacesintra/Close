@@ -242,17 +242,15 @@ fun SignUp(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 10.dp)
-
             )
 
             Button(
                 onClick = {
-                    scope.launch {
-                        if (correctEmailFormat && passwordsMatch){
-                            authViewModel.createNewAccountWithEmailAndPassword(username, email, password)
+                    if (correctEmailFormat && passwordsMatch && username != ""){
+                        authViewModel.createNewAccountWithEmailAndPassword(username, email, password)
 
-                            goToProfile()
-                        }
+                        goToProfile()
+
                     }
 
                           },
