@@ -1,20 +1,23 @@
-package com.example.close.presentation
+package com.example.close.presentation.auth.screens
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import com.example.close.presentation.models.CloseUserData
 import com.google.firebase.auth.FirebaseUser
 
 @Composable
 fun Profile(
-    user: FirebaseUser,
+    user: CloseUserData,
     signOut: () -> Unit = {}
 ){
     Column {
         Text(text = "User Details")
-        user.email?.let { Text(text = it) }
+//        user.email?.let { Text(text = it) }
 //        Text(text = user.providerData.toString())
+        Text(text = user.username)
+        
         Text(text = user.uid)
 
         Button(onClick = signOut) {

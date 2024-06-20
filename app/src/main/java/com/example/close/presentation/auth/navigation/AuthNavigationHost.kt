@@ -6,7 +6,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.close.presentation.Profile
+import com.example.close.presentation.auth.screens.Profile
 import com.example.close.presentation.auth.screens.AuthMain
 import com.example.close.presentation.auth.screens.SignIn
 import com.example.close.presentation.auth.screens.SignUp
@@ -24,6 +24,7 @@ fun AuthNavigationHost(
     val navController = rememberNavController()
 
     val authViewmodel: AuthViewModel = viewModel(factory = AuthViewModel.Factory)
+    val currentUser = authViewmodel.userData
     val signInSignUpViewModel: SignInSignUpViewModel = viewModel()
 
     val authState = authViewmodel.authState
@@ -58,6 +59,8 @@ fun AuthNavigationHost(
             goToProfile = {navController.navigate("profile")},
             goBackEvent = { navController.popBackStack() }
         ) }
-        composable("profile"){ auth.currentUser?.let { it1 -> Profile(it1, signOut = {authViewmodel.signOutUser()}) } }
+        composable("profile"){
+            Profile(user = currentUser, signOut = {authViewmodel.signOutUser()} )
+        }
     }
 }

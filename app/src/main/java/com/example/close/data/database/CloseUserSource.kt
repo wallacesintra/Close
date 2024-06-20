@@ -4,4 +4,7 @@ import com.example.close.presentation.models.CloseUserData
 
 interface CloseUserSource {
     suspend fun addNewCloseUser(newUser: CloseUserData)
+
+    suspend fun getSignInUser(uid: String): CloseUserData
+
 }
