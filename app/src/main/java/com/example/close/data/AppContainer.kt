@@ -20,7 +20,6 @@ class DefaultContainer(
 
     override val userDataSource: UserDataSource by lazy {
         UserDataSource(
-            context = applicationContext,
             auth = auth
         )
     }
