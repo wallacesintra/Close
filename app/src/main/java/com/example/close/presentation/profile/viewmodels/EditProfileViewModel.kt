@@ -23,7 +23,6 @@ class EditProfileViewModel(
                 userUid = userUid,
                 newValue = newValue
             )
-
         }
 
     }

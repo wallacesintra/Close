@@ -65,7 +65,6 @@ fun EditProfileScreen(
             painter = painterResource(id = R.drawable.info)
         )
 
-
     }
 }
 
