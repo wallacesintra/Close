@@ -14,6 +14,8 @@
     <string name="dont_match">The passwords don\'t match</string>
     <string name="have_account">Already have an account?</string>
 
+    <string name="sign_out">Sign out</string>
+
     <string name="password_visible">View password</string>
     <string name="password_not_visible">Hide password</string>
 
@@ -29,5 +31,10 @@
     <string name="icon_password">password icon</string>
 
     <string name="icon_go_back">Go back</string>
+    <string name="user_profile_img">User profile image</string>
+    <string name="app_setting">App Setting</string>
+    <string name="go_app_setting">go to app setting</string>
+    <string name="invite_friend">Invite a friend</string>
+    <string name="edit_account">Edit Profile details</string>
 
 </resources>

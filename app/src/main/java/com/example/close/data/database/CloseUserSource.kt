@@ -7,4 +7,6 @@ interface CloseUserSource {
 
     suspend fun getSignInUser(uid: String): CloseUserData
 
+    suspend fun updateDetail(detailToUpdate: String,userUid: String, newValue: String)
+
 }
