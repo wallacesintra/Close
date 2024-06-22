@@ -1,5 +1,6 @@
 package com.example.close.presentation.components
 
+
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,6 +17,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
@@ -29,8 +31,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.close.R
 
 @Composable
@@ -40,7 +44,7 @@ fun EditDetail(
     detailValue: String,
     confirmDetail: (String) -> Unit = {},
     painter: Painter,
-){
+) {
 
     var detailToEditValue by remember {
         mutableStateOf(detailValue)
@@ -86,12 +90,21 @@ fun EditDetail(
 
                 Column {
 
+
+                    Text(
+                        text = detailToEdit,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.W600,
+                        modifier = Modifier.padding(horizontal = 14.dp)
+                    )
                     MediumText(text = detailToEdit, modifier = Modifier.padding(horizontal = 14.dp))
 
                     TextField(
                         value = detailToEditValue,
                         onValueChange = { detailToEditValue = it },
                         enabled = enableEdit,
+
+                        maxLines = 2,
                         colors = TextFieldDefaults.colors(
                             focusedContainerColor = Color.Transparent,
                             unfocusedContainerColor = Color.Transparent,
@@ -100,7 +113,7 @@ fun EditDetail(
                             disabledTextColor = MaterialTheme.colorScheme.onBackground,
                             unfocusedIndicatorColor = MaterialTheme.colorScheme.primary,
 
-                        )
+                            )
                     )
                 }
 
@@ -134,18 +147,14 @@ fun EditDetail(
                                 )
                         )
                     }
-
                 }
             }
 
 
-
-
-
-
         }
     }
-}
+    }
+
 
 
 @Preview(showSystemUi = true, showBackground = true)

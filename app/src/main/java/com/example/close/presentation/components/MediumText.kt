@@ -12,7 +12,7 @@ fun MediumText(
 ){
     Text(
         text = text,
-        fontWeight = FontWeight.W500,
+        fontWeight = FontWeight.W600,
         modifier = modifier
     )
 }
