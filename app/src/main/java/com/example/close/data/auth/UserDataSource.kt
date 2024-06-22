@@ -1,8 +1,6 @@
 package com.example.close.data.auth
 
-import android.content.Context
 import android.util.Log
-import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.Dispatchers
@@ -12,7 +10,6 @@ import kotlin.coroutines.resume
 
 
 class UserDataSource(
-    private val context: Context,
     private val auth: FirebaseAuth
 ): UserSource{
 
@@ -51,6 +48,18 @@ class UserDataSource(
                 }
         }
     }
+
+    override suspend fun getSignedInUser(): Resource<FirebaseUser> = withContext(Dispatchers.IO){
+        suspendCancellableCoroutine { continuation ->
+            val signedInUser = auth.currentUser
+            if (signedInUser != null) {
+                continuation.resume(Resource.Success(signedInUser))
+            } else {
+                continuation.resume(Resource.Error("No user is currently signed in"))
+            }
+        }
+    }
+
 
     override suspend fun signOutExistingUser() {
         auth.signOut()

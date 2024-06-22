@@ -8,6 +8,8 @@ interface UserSource {
 
     suspend fun signInExistingUserWithEmailAndPassword(email: String, password: String): Resource<FirebaseUser>
 
+    suspend fun getSignedInUser(): Resource<FirebaseUser>
+
     suspend fun signOutExistingUser()
 
 }

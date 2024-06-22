@@ -29,6 +29,32 @@ class AuthViewModel(
 
     var userData by mutableStateOf(CloseUserData())
 
+    init {
+        getSignedUser()
+    }
+
+
+    private fun getSignedUser(){
+        viewModelScope.launch(Dispatchers.IO) {
+
+            when(val user =userDataSource.getSignedInUser()){
+                is Resource.Error -> {}
+                is Resource.Success -> {
+                    val uid = user.data!!.uid
+
+                    val currentUser= closeUserDataSource.getSignInUser(uid)
+
+                    userData = userData.copy(
+                        uid = currentUser.uid,
+                        email = currentUser.email,
+                        username = currentUser.username,
+                        bio = currentUser.bio
+                    )
+                }
+            }
+        }
+    }
+
 
     fun createNewAccountWithEmailAndPassword(username: String, email: String, password: String){
         viewModelScope.launch(Dispatchers.IO) {
@@ -47,7 +73,7 @@ class AuthViewModel(
                     val user= CloseUserData(
                         uid = userDetails.data!!.uid,
                         username = username,
-                        email = userDetails.data.email
+                        email = userDetails.data.email!!
                     )
 
                     closeUserDataSource.addNewCloseUser(newUser = user)
@@ -55,7 +81,12 @@ class AuthViewModel(
                     userData = userData.copy(
                         uid = user.uid,
                         username = user.username,
-                        email = user.email
+                        email = user.email,
+                        bio = user.bio
+                    )
+
+                    authState = authState.copy(
+                        isUserSignedIn = true
                     )
                 }
             }

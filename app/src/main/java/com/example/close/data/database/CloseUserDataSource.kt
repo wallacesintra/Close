@@ -4,9 +4,9 @@ import android.util.Log
 import com.example.close.presentation.models.CloseUserData
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.toObject
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import kotlinx.coroutines.CompletableDeferred
 
 class CloseUserDataSource(
     private val firestoreDb: FirebaseFirestore
@@ -37,7 +37,7 @@ class CloseUserDataSource(
             .get()
             .addOnSuccessListener { user ->
                 val userData = user.toObject<CloseUserData>()
-                Log.d("get user: successful", "user uid: " + userData?.email)
+                Log.d("firestore:get user: successful", "user uid: " + userData?.email)
 
                 if (userData != null){
                     deferred.complete(userData)
@@ -45,7 +45,7 @@ class CloseUserDataSource(
 
             }
             .addOnFailureListener {e ->
-                Log.w("get user: failure", e.message.toString())
+                Log.w("firestore:get user: failure", e.message.toString())
                 deferred.completeExceptionally(e)
             }
 
@@ -53,5 +53,28 @@ class CloseUserDataSource(
             deferred.await()
         }
     }
+
+    override suspend fun updateDetail(detailToUpdate: String, userUid: String, newValue: String) {
+
+        val deferred = CompletableDeferred<Unit>()
+
+        firestoreDb.collection("closeUsers").document(userUid)
+            .update(
+                detailToUpdate, newValue
+            )
+            .addOnSuccessListener {
+                Log.d("firestore:update user detail", "user updated successful")
+                deferred.complete(Unit)
+            }
+            .addOnFailureListener { e ->
+                Log.w("firestore:update user detail", e.message.toString())
+                deferred.completeExceptionally(e)
+            }
+
+        withContext(Dispatchers.IO){
+            deferred.await()
+        }
+    }
+
 
 }

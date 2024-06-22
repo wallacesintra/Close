@@ -249,7 +249,9 @@ fun SignUp(
                     if (correctEmailFormat && passwordsMatch && username != ""){
                         authViewModel.createNewAccountWithEmailAndPassword(username, email, password)
 
-                        goToProfile()
+                        if (authViewModel.authState.isUserSignedIn){
+                            goToProfile()
+                        }
 
                     }
 

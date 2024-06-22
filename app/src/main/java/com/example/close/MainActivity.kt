@@ -10,12 +10,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.close.presentation.auth.navigation.AuthNavigationHost
+import com.example.close.presentation.navigation.NavigationHost
 import com.example.close.ui.theme.CloseTheme
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
-import com.google.firebase.firestore.firestore
 
 class MainActivity : ComponentActivity() {
 
@@ -33,7 +32,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    AuthNavigationHost(auth = auth)
+                    NavigationHost(auth = auth)
 //                    AuthNavigationHost()
                 }
             }
