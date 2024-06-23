@@ -13,4 +13,6 @@ sealed class Screens(val route: String, val navArguments: List<NamedNavArgument>
 
     data object EditProfile: Screens("EditProfile")
 
+    data object Location: Screens("location")
+
 }

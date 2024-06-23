@@ -18,11 +18,11 @@ class LocationDataSource(
     private val context: Context,
     private val fusedLocationProviderClient: FusedLocationProviderClient,
     private val currentLocationRequest: com.google.android.gms.location.LocationRequest
-    ): LocationSource {
+): LocationSource {
 
-        private val LOCATION_PERMISSION_REQUEST_CODE = 1
+    private val LOCATION_PERMISSION_REQUEST_CODE = 1
 
-        override suspend fun fetchCurrentLocation(): Flow<LocationModel> {
+    override suspend fun fetchCurrentLocation(): Flow<LocationModel> {
         return callbackFlow {
             val callback = object : LocationCallback() {
                 override fun onLocationResult(result: LocationResult) {
@@ -30,36 +30,50 @@ class LocationDataSource(
                         trySend(
                             LocationModel(
                                 latitude = result.lastLocation?.latitude ?: 0.0,
-                                longitude = result.lastLocation?.longitude ?: 0.0
+                                longitude = result.lastLocation?.longitude ?: 0.0,
                             )
                         )
-                    } catch (e: Exception){
-                        Log.e("Location Error", e.message.toString())
+                    } catch (e: Exception) {
+                        Log.e("Location error", e.message.toString())
                     }
                 }
             }
 
-            if (
-                ActivityCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                &&
-                ActivityCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                )
-            {
+            if (ActivityCompat.checkSelfPermission(
+                    context, android.Manifest.permission.ACCESS_FINE_LOCATION
+                ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                    context, android.Manifest.permission.ACCESS_COARSE_LOCATION
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
                 ActivityCompat.requestPermissions(
                     context as Activity,
-                    arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_COARSE_LOCATION),
+                    arrayOf(
+                        android.Manifest.permission.ACCESS_FINE_LOCATION,
+                        android.Manifest.permission.ACCESS_COARSE_LOCATION
+                    ),
                     LOCATION_PERMISSION_REQUEST_CODE
                 )
+
             } else {
 
-                fusedLocationProviderClient.requestLocationUpdates(currentLocationRequest, callback, Looper.getMainLooper())
-                    .addOnFailureListener { e -> close(e) }
+                fusedLocationProviderClient.requestLocationUpdates(
+                    currentLocationRequest,
+                    callback,
+                    Looper.getMainLooper()
+                )
+                    .addOnSuccessListener {
+                        Log.d("Location fetch request: Success", "successful")
+                    }
+                    .addOnFailureListener { e ->
+                        e.message?.let { Log.w("Location fetch request: Failure", it) }
+                        close(e)
+                    }
 
                 awaitClose {
                     fusedLocationProviderClient.removeLocationUpdates(callback)
                 }
-
             }
         }
+
     }
 }

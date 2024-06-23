@@ -2,6 +2,7 @@ package com.example.close.presentation.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -11,6 +12,9 @@ import com.example.close.presentation.auth.screens.SignIn
 import com.example.close.presentation.auth.screens.SignUp
 import com.example.close.presentation.auth.viewmodel.AuthViewModel
 import com.example.close.presentation.auth.viewmodel.SignInSignUpViewModel
+import com.example.close.presentation.components.MediumText
+import com.example.close.presentation.location.screens.CurrentLocation
+import com.example.close.presentation.location.viewmodel.LocationViewModel
 import com.example.close.presentation.profile.screens.EditProfileScreen
 import com.example.close.presentation.profile.screens.ProfileScreen
 import com.example.close.presentation.profile.viewmodels.EditProfileViewModel
@@ -35,6 +39,10 @@ fun NavigationHost(
     //EditProfileViewModel
     val editProfileViewModel: EditProfileViewModel = viewModel(factory = EditProfileViewModel.Factory)
 
+    //LocationViewModel
+    val locationViewModel: LocationViewModel= viewModel(factory = LocationViewModel.factory)
+    val currentLocation = locationViewModel.location.collectAsState().value
+    val locationDetails= locationViewModel.locationDetails
 
 
     NavHost(
@@ -44,7 +52,7 @@ fun NavigationHost(
         composable(Screens.AuthMain.route){
             LaunchedEffect(key1 = Unit) {
                 if (auth.currentUser != null){
-                    navController.navigate(Screens.Profile.route)
+                    navController.navigate(Screens.Location.route)
                 }
             }
 
@@ -82,6 +90,10 @@ fun NavigationHost(
                 userData = currentUser,
                 editProfileViewModel = editProfileViewModel
             )
+        }
+
+        composable(Screens.Location.route){
+            CurrentLocation(location = locationDetails)
         }
     }
 }

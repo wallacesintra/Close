@@ -97,7 +97,6 @@ fun EditDetail(
                         fontWeight = FontWeight.W600,
                         modifier = Modifier.padding(horizontal = 14.dp)
                     )
-                    MediumText(text = detailToEdit, modifier = Modifier.padding(horizontal = 14.dp))
 
                     TextField(
                         value = detailToEditValue,
@@ -112,7 +111,6 @@ fun EditDetail(
                             disabledIndicatorColor = Color.Transparent,
                             disabledTextColor = MaterialTheme.colorScheme.onBackground,
                             unfocusedIndicatorColor = MaterialTheme.colorScheme.primary,
-
                             )
                     )
                 }
