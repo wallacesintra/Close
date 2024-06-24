@@ -28,7 +28,6 @@ fun LargeActionContainer(
 ){
     Card(
         onClick = containerAction,
-        modifier = Modifier.padding(vertical = 2.dp),
         colors = CardDefaults.cardColors(
             containerColor = containerBackground
         )

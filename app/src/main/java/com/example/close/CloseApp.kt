@@ -3,6 +3,7 @@ package com.example.close
 import android.app.Application
 import com.example.close.data.AppContainer
 import com.example.close.data.DefaultContainer
+import com.google.android.gms.maps.MapsInitializer
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
@@ -24,5 +25,8 @@ class CloseApp: Application(){
             auth = auth,
             firestoreDb = db
         )
+
+        // Initialize the Google Maps SDK
+        MapsInitializer.initialize(this)
     }
 }

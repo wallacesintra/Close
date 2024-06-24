@@ -114,8 +114,6 @@ class AuthViewModel(
                         username = signedInUser.username,
                         email = signedInUser.email
                     )
-
-
                 }
             }
         }
