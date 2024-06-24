@@ -22,6 +22,7 @@ class MainActivity : ComponentActivity() {
 
     private  lateinit var auth: FirebaseAuth
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
 
         ActivityCompat.requestPermissions(
@@ -43,7 +44,10 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
+                    val packageName = this.packageName
+
                     NavigationHost(auth = auth)
+//                    Text(text = packageName)
                 }
             }
         }

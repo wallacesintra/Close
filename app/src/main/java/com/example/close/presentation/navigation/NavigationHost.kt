@@ -42,7 +42,7 @@ fun NavigationHost(
     //LocationViewModel
     val locationViewModel: LocationViewModel= viewModel(factory = LocationViewModel.factory)
     val currentLocation = locationViewModel.location.collectAsState().value
-    val locationDetails= locationViewModel.locationDetails
+    val locationDetails= locationViewModel.locationState
 
 
     NavHost(
@@ -93,7 +93,7 @@ fun NavigationHost(
         }
 
         composable(Screens.Location.route){
-            CurrentLocation(location = locationDetails)
+            CurrentLocation(locationState = locationDetails)
         }
     }
 }
