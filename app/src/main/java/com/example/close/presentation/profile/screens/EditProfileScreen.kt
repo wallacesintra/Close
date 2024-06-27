@@ -62,6 +62,7 @@ fun EditProfileScreen(
                                 newValue = newBio
                             )
             },
+            detailToEditCharacterCount = 40,
             painter = painterResource(id = R.drawable.info)
         )
 

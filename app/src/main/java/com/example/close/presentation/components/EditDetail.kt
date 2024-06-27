@@ -44,6 +44,7 @@ fun EditDetail(
     detailValue: String,
     confirmDetail: (String) -> Unit = {},
     painter: Painter,
+    detailToEditCharacterCount: Int = 18
 ) {
 
     var detailToEditValue by remember {
@@ -89,8 +90,6 @@ fun EditDetail(
                 )
 
                 Column {
-
-
                     Text(
                         text = detailToEdit,
                         fontSize = 18.sp,
@@ -100,7 +99,9 @@ fun EditDetail(
 
                     TextField(
                         value = detailToEditValue,
-                        onValueChange = { detailToEditValue = it },
+                        onValueChange = { text ->
+                            detailToEditValue = text
+                                        },
                         enabled = enableEdit,
 
                         maxLines = 2,

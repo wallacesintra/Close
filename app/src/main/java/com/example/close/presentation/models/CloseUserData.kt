@@ -7,7 +7,7 @@ data class CloseUserData(
     val username: String = "",
     val email: String = "",
     val bio: String = "Close is bringing me closer to you",
-    val friends: List<FirebaseUser> = emptyList(),
-    val shareLocation: Boolean = false,
+    val friends: List<String> = emptyList(),
+    var shareLocation: Boolean = false,
 )
 

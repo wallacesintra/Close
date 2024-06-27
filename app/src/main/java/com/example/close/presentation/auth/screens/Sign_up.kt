@@ -250,7 +250,7 @@ fun SignUp(
                         authViewModel.createNewAccountWithEmailAndPassword(username, email, password)
 
                         if (authViewModel.authState.isUserSignedIn){
-                            goToProfile()
+                            goToSignIn()
                         }
 
                     }

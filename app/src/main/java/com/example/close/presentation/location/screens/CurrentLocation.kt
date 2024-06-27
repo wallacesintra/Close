@@ -25,7 +25,14 @@ fun CurrentLocation(
             
             MapView(
                 locationDetails = location,
-                friendLocation = listOf(LatLng(-0.710000, 36.294319), LatLng(-1.292066, 36.821945), LatLng(-0.091702, 34.767956))
+                friendLocation = listOf(
+                    LatLng(-0.710000, 36.294319),
+                    LatLng(-1.292066, 36.821945),
+                    LatLng(-0.091702, 34.767956),
+                    LatLng(-1.194400, 36.944630),
+                    LatLng(-1.265040, 36.804550),
+                    LatLng(-1.225080, 36.877820)
+                )
             )
             
         }

@@ -3,13 +3,12 @@ package com.example.close.presentation.location.components
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.close.R
-import com.example.close.presentation.location.LocationDetails
+import com.example.close.presentation.location.models.LocationDetails
 import com.example.close.utils.ConvertImgToBitmapDescriptor
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -33,8 +32,6 @@ fun MapView(locationDetails: LocationDetails, friendLocation: List<LatLng> = emp
 
 
     Column {
-        Text(text = "Current")
-
         GoogleMap(
             modifier = Modifier
                 .fillMaxSize(),
@@ -71,5 +68,6 @@ fun MapViewPreview(){
     MapView(locationDetails = LocationDetails(
         lat = -0.710000,
         long = 36.294319
-    ))
+    )
+    )
 }

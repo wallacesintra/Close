@@ -4,10 +4,10 @@
     <selectionStates>
       <SelectionState runConfigName="app">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2024-06-24T19:34:23.695136551Z">
+        <DropdownSelection timestamp="2024-06-27T19:29:04.883741951Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="LocalEmulator" identifier="path=/home/wallace/.android/avd/Small_Phone_Android_7_API_24.avd" />
+              <DeviceId pluginId="PhysicalDevice" identifier="serial=051251102J000241" />
             </handle>
           </Target>
         </DropdownSelection>
