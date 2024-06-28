@@ -13,19 +13,22 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.close.R
 
 @Composable
-fun LargeProfileImg(){
+fun ProfileImg(
+    modifier: Modifier = Modifier,
+    imgSize:  Dp
+){
     Image(
         painter = painterResource(id = R.drawable.female_dp),
         contentDescription = stringResource(id = R.string.user_profile_img),
         contentScale = ContentScale.Crop,
         alignment = Alignment.Center,
-        modifier = Modifier
-            .padding(20.dp)
-            .size(120.dp)
+        modifier = modifier
+            .size(imgSize)
             .clip(CircleShape)
             .border(
                 width = 1.dp,

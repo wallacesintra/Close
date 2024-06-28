@@ -12,21 +12,23 @@ import com.example.close.presentation.auth.screens.SignIn
 import com.example.close.presentation.auth.screens.SignUp
 import com.example.close.presentation.auth.viewmodel.AuthViewModel
 import com.example.close.presentation.auth.viewmodel.SignInSignUpViewModel
-import com.example.close.presentation.components.MediumText
+import com.example.close.presentation.friends.screens.FriendProfileScreen
+import com.example.close.presentation.friends.screens.FriendRequestsScreen
+import com.example.close.presentation.friends.viewmodels.FriendRequestsViewModel
 import com.example.close.presentation.location.screens.CurrentLocation
 import com.example.close.presentation.location.viewmodel.LocationViewModel
 import com.example.close.presentation.profile.screens.EditProfileScreen
 import com.example.close.presentation.profile.screens.ProfileScreen
+import com.example.close.presentation.friends.screens.SearchUser
 import com.example.close.presentation.profile.viewmodels.EditProfileViewModel
+import com.example.close.presentation.profile.viewmodels.SearchUserViewModel
 import com.google.firebase.auth.FirebaseAuth
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 
 @Composable
 fun NavigationHost(
     auth: FirebaseAuth
 ){
-    val scope = CoroutineScope(Dispatchers.Main)
+//    val scope = CoroutineScope(Dispatchers.Main)
     val navController = rememberNavController()
 
     // AuthViewModel
@@ -44,6 +46,12 @@ fun NavigationHost(
     val currentLocation = locationViewModel.location.collectAsState().value
     val locationDetails= locationViewModel.locationState
 
+    //search user viewmodel
+    val searchUserViewModel: SearchUserViewModel = viewModel(factory = SearchUserViewModel.Factory)
+
+    //friend request viewmodel
+    val friendRequestsViewModel: FriendRequestsViewModel = viewModel(factory = FriendRequestsViewModel.Factory)
+
 
     NavHost(
         navController = navController,
@@ -52,7 +60,7 @@ fun NavigationHost(
         composable(Screens.AuthMain.route){
             LaunchedEffect(key1 = Unit) {
                 if (auth.currentUser != null){
-                    navController.navigate(Screens.Location.route)
+                    navController.navigate(Screens.Profile.route)
                 }
             }
 
@@ -81,7 +89,9 @@ fun NavigationHost(
             ProfileScreen(
                 userData = currentUser,
                 signOutEvent = { authViewmodel.signOutUser() },
-                goEditProfile = { navController.navigate(Screens.EditProfile.route) }
+                goEditProfile = { navController.navigate(Screens.EditProfile.route) },
+                goAppSetting = {navController.navigate(Screens.FriendRequest.route)},
+                inviteFriendEvent = {navController.navigate(Screens.SearchUser.route)}
             )
         }
 
@@ -92,8 +102,42 @@ fun NavigationHost(
             )
         }
 
+        composable(Screens.SearchUser.route){
+            SearchUser(
+                searchUserViewModel = searchUserViewModel,
+                currentUserUid = currentUser.uid,
+                goToFriendProfile = {userUid ->
+                    navController.navigate(Screens.FriendProfile.createRoute(userUid))
+                }
+            )
+        }
+
         composable(Screens.Location.route){
             CurrentLocation(locationState = locationDetails)
+        }
+
+        composable(
+
+            route = Screens.FriendProfile.route,
+
+            arguments = Screens.FriendProfile.navArguments
+        ){
+            val userUid = it.arguments?.getString("userUid")
+
+            if (userUid != null) {
+                FriendProfileScreen(
+                    friendUid = userUid,
+                    currentUserUid = currentUser.uid,
+                    sendFriendRequestAction = {
+                        friendRequestsViewModel.sendFriendRequest(senderUid = currentUser.uid, receiverUid = userUid)
+                    }
+                )
+            }
+
+        }
+
+        composable(Screens.FriendRequest.route){
+            FriendRequestsScreen(currentUserUid = currentUser.uid, friendRequestsViewModel = friendRequestsViewModel)
         }
     }
 }

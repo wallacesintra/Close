@@ -2,6 +2,7 @@ package com.example.close.data
 
 import android.content.Context
 import com.example.close.data.auth.UserDataSource
+import com.example.close.data.cometChat.CometChatAuthImp
 import com.example.close.data.database.CloseUserDataSource
 import com.example.close.data.location.LocationDataSource
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -14,12 +15,16 @@ interface AppContainer {
     val userDataSource: UserDataSource
     val closeUserDataSource: CloseUserDataSource
     val locationDataSource: LocationDataSource
+    val cometChatAuthImp: CometChatAuthImp
 }
 
 class DefaultContainer(
     private val applicationContext: Context,
     private val auth: FirebaseAuth,
-    private val firestoreDb: FirebaseFirestore
+    private val firestoreDb: FirebaseFirestore,
+    private val cometAppID: String,
+    private val cometRegion: String,
+    private val cometRestApiKey: String
 
 ): AppContainer {
 
@@ -44,6 +49,13 @@ class DefaultContainer(
             context = applicationContext,
             fusedLocationProviderClient = fusedLocationClient,
             currentLocationRequest = LocationRequest.create()
+        )
+    }
+    override val cometChatAuthImp: CometChatAuthImp by lazy {
+        CometChatAuthImp(
+            appID = cometAppID,
+            region = cometRegion,
+            restApiKey = cometRestApiKey
         )
     }
 

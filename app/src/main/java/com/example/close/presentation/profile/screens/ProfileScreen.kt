@@ -13,7 +13,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.close.R
 import com.example.close.presentation.components.LargeActionContainer
-import com.example.close.presentation.components.LargeProfileImg
+import com.example.close.presentation.components.ProfileImg
 import com.example.close.presentation.components.LargeText
 import com.example.close.presentation.components.MediumText
 import com.example.close.presentation.models.CloseUserData
@@ -31,7 +31,7 @@ fun ProfileScreen(
         modifier = Modifier
             .fillMaxSize()
     ) {
-        LargeProfileImg()
+        ProfileImg(imgSize = 120.dp, modifier = Modifier.padding(20.dp))
 
         LargeText(text = userData.username)
 

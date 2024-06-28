@@ -1,6 +1,5 @@
 package com.example.close.presentation.auth.viewmodel
 
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -13,16 +12,17 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.close.CloseApp
 import com.example.close.data.auth.Resource
 import com.example.close.data.auth.UserDataSource
+import com.example.close.data.cometChat.CometChatAuthImp
 import com.example.close.data.database.CloseUserDataSource
 import com.example.close.presentation.auth.models.AuthState
 import com.example.close.presentation.models.CloseUserData
-import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class AuthViewModel(
     private val userDataSource: UserDataSource,
-    private val closeUserDataSource: CloseUserDataSource
+    private val closeUserDataSource: CloseUserDataSource,
+    private val cometChatAuthImp: CometChatAuthImp
 ): ViewModel() {
 
     var authState: AuthState by mutableStateOf(AuthState())
@@ -42,7 +42,7 @@ class AuthViewModel(
                 is Resource.Success -> {
                     val uid = user.data!!.uid
 
-                    val currentUser= closeUserDataSource.getSignInUser(uid)
+                    val currentUser= closeUserDataSource.getSignedInUser(uid)
 
                     userData = userData.copy(
                         uid = currentUser.uid,
@@ -59,9 +59,9 @@ class AuthViewModel(
     fun createNewAccountWithEmailAndPassword(username: String, email: String, password: String){
         viewModelScope.launch(Dispatchers.IO) {
             val userDetails =userDataSource.createNewAccountWithEmailAndPassword(
-                email = email,
-                username = username,
-                password = password
+                email = email.trim(),
+                username = username.trim(),
+                password = password.trim()
             )
 
 
@@ -78,6 +78,10 @@ class AuthViewModel(
 
                     closeUserDataSource.addNewCloseUser(newUser = user)
 
+                    //create comet chat user
+                    cometChatAuthImp.createCometUser(userId = user.uid, username = user.username)
+
+
                     userData = userData.copy(
                         uid = user.uid,
                         username = user.username,
@@ -88,6 +92,7 @@ class AuthViewModel(
                     authState = authState.copy(
                         isUserSignedIn = true
                     )
+
                 }
             }
 
@@ -107,13 +112,21 @@ class AuthViewModel(
 
                     val uid = userDetails.data!!.uid
 
-                    val signedInUser =closeUserDataSource.getSignInUser(uid)
+                    val signedInUser =closeUserDataSource.getSignedInUser(uid)
 
                     userData = userData.copy(
                         uid = signedInUser.uid,
                         username = signedInUser.username,
                         email = signedInUser.email
                     )
+
+                    authState = authState.copy(
+                        isUserSignedIn = true
+                    )
+
+                    //login to cometchat
+                    cometChatAuthImp.logInUser(userId = uid)
+
                 }
             }
         }
@@ -128,6 +141,7 @@ class AuthViewModel(
             )
 
             userData = CloseUserData()
+            cometChatAuthImp.logOutUser()
         }
     }
 
@@ -138,8 +152,13 @@ class AuthViewModel(
                 val application = (this[APPLICATION_KEY] as CloseApp)
                 val userDataSource = application.container.userDataSource
                 val closeUserDataSource = application.container.closeUserDataSource
+                val cometChatAuthImp = application.container.cometChatAuthImp
 
-                AuthViewModel(userDataSource = userDataSource, closeUserDataSource = closeUserDataSource)
+                AuthViewModel(
+                    userDataSource = userDataSource,
+                    closeUserDataSource = closeUserDataSource,
+                    cometChatAuthImp = cometChatAuthImp
+                )
             }
         }
     }
