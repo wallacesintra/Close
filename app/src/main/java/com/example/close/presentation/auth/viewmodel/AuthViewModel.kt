@@ -48,7 +48,9 @@ class AuthViewModel(
                         uid = currentUser.uid,
                         email = currentUser.email,
                         username = currentUser.username,
-                        bio = currentUser.bio
+                        bio = currentUser.bio,
+                        friends = currentUser.friends,
+                        shareLocation = currentUser.shareLocation
                     )
                 }
             }
@@ -73,7 +75,7 @@ class AuthViewModel(
                     val user= CloseUserData(
                         uid = userDetails.data!!.uid,
                         username = username,
-                        email = userDetails.data.email!!
+                        email = userDetails.data.email!!,
                     )
 
                     closeUserDataSource.addNewCloseUser(newUser = user)
@@ -86,7 +88,9 @@ class AuthViewModel(
                         uid = user.uid,
                         username = user.username,
                         email = user.email,
-                        bio = user.bio
+                        bio = user.bio,
+                        friends = user.friends,
+                        shareLocation = user.shareLocation
                     )
 
                     authState = authState.copy(

@@ -1,6 +1,5 @@
 package com.example.close.presentation.friends.screens
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -10,7 +9,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -24,6 +22,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.close.R
+import com.example.close.presentation.components.Loading
 import com.example.close.presentation.components.MediumFriendProfileContainer
 import com.example.close.presentation.components.MediumText
 import com.example.close.presentation.profile.viewmodels.SearchUserViewModel
@@ -32,7 +31,6 @@ import com.example.close.presentation.profile.viewmodels.SearchUserViewModel
 fun SearchUser(
     currentUserUid: String,
     searchUserViewModel: SearchUserViewModel,
-//    friendRequestsViewModel: FriendRequestsViewModel,
     goToFriendProfile: (String) -> Unit
 ){
 
@@ -68,11 +66,7 @@ fun SearchUser(
 
 
         if (isSearching){
-            Box(modifier = Modifier.fillMaxSize()) {
-                CircularProgressIndicator(
-                    modifier = Modifier.align(Alignment.Center)
-                )
-            }
+            Loading()
         }else {
             if (closeUsers.isEmpty() && searchText.isNotEmpty()){
                 MediumText(text = stringResource(id = R.string.no_user_found), modifier = Modifier.padding(10.dp))
@@ -83,7 +77,6 @@ fun SearchUser(
                     MediumFriendProfileContainer(
                         userUid = user.uid,
                         username = user.username,
-                        userEmail = user.bio,
                         goToFriendProfile = goToFriendProfile
                     )
                 }

@@ -42,4 +42,8 @@
 
     <string name="confirm_request">Confirm Friend Request</string>
 
+    <string name="your_friends">Your Friends</string>
+    <string name="friend_requests">Friend Requests</string>
+    <string name="friends">Friends</string>
+
 </resources>

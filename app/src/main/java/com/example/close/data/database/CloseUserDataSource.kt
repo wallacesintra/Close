@@ -4,14 +4,11 @@ import android.util.Log
 import com.example.close.data.database.models.CloseUsers
 import com.example.close.data.database.models.FriendRequest
 import com.example.close.presentation.models.CloseUserData
-import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.toObject
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import kotlin.coroutines.resume
@@ -160,6 +157,7 @@ class CloseUserDataSource(
         }
     }
 
+
     override suspend fun sendFriendRequest(senderUid: String, receiverUid: String){
         val deferred = CompletableDeferred<Unit>()
         val requestUid = "$senderUid$receiverUid"
@@ -207,6 +205,7 @@ class CloseUserDataSource(
                                     requestUid = friendRequest.requestUid,
                                     receiverUid = friendRequest.receiverUid,
                                     senderUid = friendRequest.senderUid,
+                                    accepted = friendRequest.accepted
 //                                    timeStamp = friendRequest.timeStamp
 //                                    timeStamp = timestampLong
                                 )

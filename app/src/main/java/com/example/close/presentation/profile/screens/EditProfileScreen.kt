@@ -12,18 +12,14 @@ import androidx.compose.ui.unit.dp
 import com.example.close.R
 import com.example.close.presentation.components.EditDetail
 import com.example.close.presentation.components.ExtraLargeProfileImg
-import com.example.close.presentation.components.LargeActionContainer
 import com.example.close.presentation.models.CloseUserData
-import com.example.close.presentation.profile.viewmodels.EditProfileViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import com.example.close.presentation.profile.viewmodels.CurrentUserProfileDetailsViewModel
 
 @Composable
 fun EditProfileScreen(
     modifier: Modifier = Modifier,
     userData: CloseUserData,
-    editProfileViewModel: EditProfileViewModel
+    currentUserProfileDetailsViewModel: CurrentUserProfileDetailsViewModel
 ){
 
 
@@ -42,7 +38,7 @@ fun EditProfileScreen(
             detailToEdit = "username",
             detailValue = userData.username,
             confirmDetail = {newUsername ->
-                            editProfileViewModel.updateCurrentUserDetails(
+                            currentUserProfileDetailsViewModel.updateCurrentUserDetails(
                                 detailToUpdate = "username",
                                 userUid = userData.uid,
                                 newValue = newUsername
@@ -56,7 +52,7 @@ fun EditProfileScreen(
             detailToEdit = "user bio",
             detailValue = userData.bio,
             confirmDetail = { newBio ->
-                            editProfileViewModel.updateCurrentUserDetails(
+                            currentUserProfileDetailsViewModel.updateCurrentUserDetails(
                                 userUid = userData.uid,
                                 detailToUpdate = "bio",
                                 newValue = newBio
