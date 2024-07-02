@@ -17,7 +17,6 @@ interface CloseUserSource {
 
     suspend fun addFriend(closeUid: String, newFriendUid: String)
 
-
     suspend fun sendFriendRequest(senderUid: String, receiverUid: String)
 
     suspend fun getFriendRequests(receiverUid: String): List<FriendRequest>

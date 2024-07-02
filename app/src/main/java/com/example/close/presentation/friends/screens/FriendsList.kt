@@ -58,10 +58,10 @@ fun FriendsScreen(
     }
 
     Column {
-        LargeText(text = stringResource(id = R.string.friends), modifier = Modifier.padding(10.dp), isBold = true)
+        LargeText(text = stringResource(id = R.string.friends), modifier = Modifier.padding(10.dp), isBold = false)
 
         MediumText(
-            isBold = true,
+//            isBold = true,
             text = stringResource(id = R.string.friend_requests),
             modifier = Modifier
                 .padding(6.dp)

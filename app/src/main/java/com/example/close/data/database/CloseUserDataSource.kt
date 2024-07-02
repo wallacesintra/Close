@@ -157,11 +157,9 @@ class CloseUserDataSource(
         }
     }
 
-
     override suspend fun sendFriendRequest(senderUid: String, receiverUid: String){
         val deferred = CompletableDeferred<Unit>()
         val requestUid = "$senderUid$receiverUid"
-        val timeStamp = FieldValue.serverTimestamp()
 
         val newRequest = hashMapOf(
             "requestUid" to requestUid,
@@ -194,6 +192,7 @@ class CloseUserDataSource(
                     .whereEqualTo("receiverUid", receiverUid)
                     .get()
                     .addOnSuccessListener { friendRequests ->
+
                         val requests = mutableListOf<FriendRequest>()
 
                         for (i in friendRequests) {

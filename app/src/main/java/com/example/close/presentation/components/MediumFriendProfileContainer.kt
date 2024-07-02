@@ -14,7 +14,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 
-//@Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun MediumFriendProfileContainer(
     userUid: String,

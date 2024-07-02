@@ -37,6 +37,7 @@ import com.example.close.presentation.friends.viewmodels.FriendRequestsViewModel
 import com.example.close.presentation.location.screens.CurrentLocation
 import com.example.close.presentation.location.viewmodel.LocationViewModel
 import com.example.close.presentation.messaging.screens.MessageScreen
+import com.example.close.presentation.messaging.viewmodel.MessagingViewModel
 import com.example.close.presentation.profile.screens.EditProfileScreen
 import com.example.close.presentation.profile.screens.ProfileScreen
 import com.example.close.presentation.profile.viewmodels.CurrentUserProfileDetailsViewModel
@@ -71,17 +72,20 @@ fun NavigationHost(
     //friend request viewmodel
     val friendRequestsViewModel: FriendRequestsViewModel = viewModel(factory = FriendRequestsViewModel.Factory)
 
+    //messaging viewmodel
+    val messagingViewModel: MessagingViewModel = viewModel(factory = MessagingViewModel.Factory)
+
     Scaffold(
 
         bottomBar = {
-            if (auth.currentUser != null){
+
+            val navBackStackEntry by navController.currentBackStackEntryAsState()
+            val currentDestination = navBackStackEntry?.destination
+
+
+            if (Screens.any { screen -> currentDestination?.hierarchy?.any { it.route == screen.route } == true }){
                 BottomAppBar(
-//                containerColor = Color.Transparent
                 ) {
-
-                    val navBackStackEntry by navController.currentBackStackEntryAsState()
-                    val currentDestination = navBackStackEntry?.destination
-
                     Row(
                         horizontalArrangement = Arrangement.SpaceEvenly,
                         modifier = Modifier.fillMaxWidth()
@@ -200,7 +204,10 @@ fun NavigationHost(
             }
 
             composable(Screen.Messages.route){
-                MessageScreen()
+                MessageScreen(
+                    currentUserUid = currentUser.uid,
+                    messagingViewModel = messagingViewModel
+                )
             }
 
             composable(Screen.Friends.route){

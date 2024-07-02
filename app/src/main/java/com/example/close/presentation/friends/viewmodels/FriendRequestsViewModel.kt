@@ -1,7 +1,5 @@
 package com.example.close.presentation.friends.viewmodels
 
-//import kotlinx.coroutines.DefaultExecutor.isActive
-//import kotlinx.coroutines.isActive
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -14,13 +12,16 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.close.CloseApp
 import com.example.close.data.database.CloseUserDataSource
+import com.example.close.data.messaging.CloseMessagingDataSource
+import com.example.close.data.messaging.models.CloseChatRoom
 import com.example.close.presentation.friends.models.CloseFriendRequest
 import com.example.close.presentation.friends.models.FriendRequestsState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class FriendRequestsViewModel(
-    private val closeUserDataSource: CloseUserDataSource
+    private val closeUserDataSource: CloseUserDataSource,
+    private val closeMessagingDataSource: CloseMessagingDataSource
 ): ViewModel() {
 
     var friendRequestsState : FriendRequestsState by mutableStateOf(FriendRequestsState.Loading)
@@ -40,6 +41,13 @@ class FriendRequestsViewModel(
             closeUserDataSource.acceptFriendRequest(requestUid = closeFriendRequest.requestUid)
 
             closeUserDataSource.addFriend(closeUid = currentUserUid, newFriendUid = closeFriendRequest.senderUid)
+
+            val newCloseChatRoom = CloseChatRoom(
+                chatUid = closeFriendRequest.requestUid,
+                members = listOf(closeFriendRequest.senderUid, currentUserUid),
+                messages = emptyList()
+            )
+            closeMessagingDataSource.createChatRoom(newCloseChatRoom)
         }
     }
 
@@ -93,8 +101,12 @@ class FriendRequestsViewModel(
             initializer {
                 val application = (this[APPLICATION_KEY] as CloseApp)
                 val closeUserDataSource = application.container.closeUserDataSource
+                val closeMessagingDataSource = application.container.closeMessagingDataSource
 
-                FriendRequestsViewModel(closeUserDataSource = closeUserDataSource)
+                FriendRequestsViewModel(
+                    closeUserDataSource = closeUserDataSource,
+                    closeMessagingDataSource = closeMessagingDataSource
+                )
             }
         }
     }

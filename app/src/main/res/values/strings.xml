@@ -46,4 +46,6 @@
     <string name="friend_requests">Friend Requests</string>
     <string name="friends">Friends</string>
 
+    <string name="chats">Chats</string>
+
 </resources>
