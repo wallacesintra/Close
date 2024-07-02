@@ -1,6 +1,6 @@
 package com.example.close.data.database
 
-import com.example.close.data.database.models.CloseUsers
+import com.example.close.data.database.models.CloseUser
 import com.example.close.data.database.models.FriendRequest
 import com.example.close.presentation.models.CloseUserData
 
@@ -11,9 +11,9 @@ interface CloseUserSource {
 
     suspend fun updateDetail(detailToUpdate: String,userUid: String, newValue: String)
 
-    suspend fun findUserByUsername(username: String): List<CloseUsers>
+    suspend fun findUserByUsername(username: String): List<CloseUser>
 
-    suspend fun getCloseUserByUid(closeUid: String): CloseUsers
+    suspend fun getCloseUserByUid(closeUid: String): CloseUser
 
     suspend fun addFriend(closeUid: String, newFriendUid: String)
 

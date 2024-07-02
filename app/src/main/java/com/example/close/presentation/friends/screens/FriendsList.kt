@@ -17,7 +17,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.close.R
-import com.example.close.data.database.models.CloseUsers
+import com.example.close.data.database.models.CloseUser
 import com.example.close.presentation.components.LargeText
 import com.example.close.presentation.components.Loading
 import com.example.close.presentation.components.MediumFriendProfileContainer
@@ -27,7 +27,7 @@ import com.example.close.presentation.profile.viewmodels.CurrentUserProfileDetai
 
 @Composable
 fun FriendsList(
-    friendsList: List<CloseUsers>,
+    friendsList: List<CloseUser>,
 ){
     Column {
 
@@ -92,6 +92,6 @@ fun FriendsScreen(
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun FriendsScreenPreview(){
-    FriendsList(friendsList = listOf(CloseUsers(uid = "sysfiiyg", username = "wallace",)))
+    FriendsList(friendsList = listOf(CloseUser(uid = "sysfiiyg", username = "wallace",)))
 //    FriendsScreen(friendsList = emptyList())
 }

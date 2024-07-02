@@ -25,10 +25,10 @@ import com.example.close.presentation.messaging.models.CloseChatRoomUI
 fun ChatRoomContainer(
     modifier: Modifier = Modifier,
     closeChatRoomUi: CloseChatRoomUI,
-    goToChatRoom: () -> Unit = {}
+    goToChatRoom: (String) -> Unit = {}
 ){
     Card(
-        onClick = goToChatRoom,
+        onClick = { goToChatRoom(closeChatRoomUi.chatUid) },
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.background
         ),
@@ -50,7 +50,7 @@ fun ChatRoomContainer(
                 modifier =Modifier.padding(10.dp)
             ) {
                 MediumText(
-                    text = "${closeChatRoomUi.members[0].username} & ${closeChatRoomUi.members[1].username}",
+                    text = closeChatRoomUi.members.joinToString(separator = ", ") { member -> member.username },
                     isBold = true,
                 )
                 MediumText(

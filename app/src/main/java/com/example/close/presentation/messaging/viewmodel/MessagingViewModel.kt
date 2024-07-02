@@ -11,10 +11,12 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.close.CloseApp
 import com.example.close.data.database.CloseUserDataSource
-import com.example.close.data.database.models.CloseUsers
+import com.example.close.data.database.models.CloseUser
 import com.example.close.data.messaging.CloseMessagingDataSource
 import com.example.close.presentation.messaging.models.ChatRoomsState
 import com.example.close.presentation.messaging.models.CloseChatRoomUI
+import com.example.close.presentation.messaging.models.MessageState
+import com.example.close.presentation.messaging.models.MessageUI
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -24,6 +26,7 @@ class MessagingViewModel(
 ): ViewModel() {
 
     var chatRoomsState: ChatRoomsState by mutableStateOf(ChatRoomsState.Loading)
+    var messageState: MessageState by mutableStateOf(MessageState.Loading)
 
     fun sendMessage(roomUid: String, senderUid: String, textMessage:String){
         viewModelScope.launch(Dispatchers.IO) {
@@ -40,7 +43,7 @@ class MessagingViewModel(
                 val closeChatRoomLIstUI = mutableListOf<CloseChatRoomUI>()
 
                 for (room in chatRoomList){
-                    val membersList = mutableListOf<CloseUsers>()
+                    val membersList = mutableListOf<CloseUser>()
 
                     for (member in room.members){
                         val closeUser = closeUserDataSource.getCloseUserByUid(member)
@@ -64,6 +67,39 @@ class MessagingViewModel(
                 }
             }catch (e: Exception){
                 chatRoomsState = ChatRoomsState.Error(errorMessage = e.message!!)
+            }
+        }
+    }
+
+    fun getChatRoomByChatUid(chatRoom: String){
+        viewModelScope.launch {
+            try {
+
+                messageState = MessageState.Loading
+
+                val currentChatRoom = closeMessagingDataSource.getChatRoomByChatRoomUid(chatroomUid = chatRoom)
+
+                val messagesList = mutableListOf<MessageUI>()
+
+                for (message in currentChatRoom.messages){
+                    val sender = closeUserDataSource.getCloseUserByUid(message.senderUid)
+
+                    messagesList.add(
+                        MessageUI(
+                            messageUid = message.messageUid,
+                            sender = sender,
+                            message = message.message,
+                        )
+                    )
+                }
+
+                messageState = try {
+                    MessageState.Success(messagesList = messagesList)
+                }catch (e: Exception){
+                    MessageState.Error(e.message!!)
+                }
+            }catch (e: Exception){
+                messageState = MessageState.Error(error = e.message!!)
             }
         }
     }

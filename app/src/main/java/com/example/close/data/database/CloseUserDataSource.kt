@@ -1,7 +1,7 @@
 package com.example.close.data.database
 
 import android.util.Log
-import com.example.close.data.database.models.CloseUsers
+import com.example.close.data.database.models.CloseUser
 import com.example.close.data.database.models.FriendRequest
 import com.example.close.presentation.models.CloseUserData
 import com.google.firebase.firestore.FieldValue
@@ -85,8 +85,8 @@ class CloseUserDataSource(
         }
     }
 
-    override suspend fun findUserByUsername(username: String): List<CloseUsers> = withContext(Dispatchers.IO) {
-        suspendCancellableCoroutine<List<CloseUsers>> { continuation ->
+    override suspend fun findUserByUsername(username: String): List<CloseUser> = withContext(Dispatchers.IO) {
+        suspendCancellableCoroutine<List<CloseUser>> { continuation ->
             firestoreDb.collection("closeUsers")
                 .orderBy("username")
                 .startAt(username)
@@ -94,10 +94,10 @@ class CloseUserDataSource(
                 .get()
                 .addOnSuccessListener { users ->
                     Log.d("firestore: find by username", "searching")
-                    val closeUsersList = mutableListOf<CloseUsers>()
+                    val closeUserList = mutableListOf<CloseUser>()
                     for(i in users){
                         val user = i.toObject<CloseUserData>()
-                        closeUsersList.add(CloseUsers(
+                        closeUserList.add(CloseUser(
                             uid = user.uid,
                             username = user.username,
                             bio = user.bio,
@@ -105,7 +105,7 @@ class CloseUserDataSource(
                         ))
                         Log.d("firestore: find by username", "users found" + i.data)
                     }
-                    continuation.resume(closeUsersList)
+                    continuation.resume(closeUserList)
                 }
                 .addOnFailureListener {e ->
                     Log.w("firestore: find by username", "user not found" + e.message)
@@ -114,13 +114,13 @@ class CloseUserDataSource(
         }
     }
 
-    override suspend fun getCloseUserByUid(closeUid: String): CloseUsers {
-        val deferred = CompletableDeferred<CloseUsers>()
+    override suspend fun getCloseUserByUid(closeUid: String): CloseUser {
+        val deferred = CompletableDeferred<CloseUser>()
 
         firestoreDb.collection("closeUsers").document(closeUid)
             .get()
             .addOnSuccessListener { user ->
-                val userData = user.toObject<CloseUsers>()
+                val userData = user.toObject<CloseUser>()
                 Log.d("firestore:get user: successful", "user uid: " + userData?.username)
 
                 if (userData != null){

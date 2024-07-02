@@ -32,6 +32,15 @@ sealed class Screen(val route: String, val navArguments: List<NamedNavArgument> 
         fun createRoute(userUid: String) = "FriendProfileScreen/${userUid}"
     }
 
+    data object SingleChatRoom: Screen(
+        route = "SingleChatRoom/{chatRoomUID}",
+        navArguments = listOf(navArgument("chatRoomUID"){
+            type = NavType.StringType
+        })
+    ){
+        fun createRoute(chatRoomUID: String) = "SingleChatRoom/${chatRoomUID}"
+    }
+
     data object Friends: Screen("Friends", icon = R.drawable.group)
 
     data object Messages: Screen("Messages", icon = R.drawable.chat)

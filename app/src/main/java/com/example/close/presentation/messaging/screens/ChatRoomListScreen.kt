@@ -20,7 +20,8 @@ import com.example.close.presentation.messaging.viewmodel.MessagingViewModel
 @Composable
 fun MessageScreen(
     currentUserUid: String,
-    messagingViewModel: MessagingViewModel
+    messagingViewModel: MessagingViewModel,
+    goToChatRoom: (String) -> Unit
 ){
     val chatRoomsState = messagingViewModel.chatRoomsState
 
@@ -41,6 +42,7 @@ fun MessageScreen(
                     items(chatRoomsState.chatRoomList) {room ->
                         ChatRoomContainer(
                             closeChatRoomUi = room,
+                            goToChatRoom = goToChatRoom,
                             modifier = Modifier.padding(bottom = 10.dp)
                         )
                     }

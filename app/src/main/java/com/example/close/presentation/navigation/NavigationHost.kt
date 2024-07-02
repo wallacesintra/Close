@@ -37,6 +37,7 @@ import com.example.close.presentation.friends.viewmodels.FriendRequestsViewModel
 import com.example.close.presentation.location.screens.CurrentLocation
 import com.example.close.presentation.location.viewmodel.LocationViewModel
 import com.example.close.presentation.messaging.screens.MessageScreen
+import com.example.close.presentation.messaging.screens.SingleChatRoom
 import com.example.close.presentation.messaging.viewmodel.MessagingViewModel
 import com.example.close.presentation.profile.screens.EditProfileScreen
 import com.example.close.presentation.profile.screens.ProfileScreen
@@ -206,7 +207,10 @@ fun NavigationHost(
             composable(Screen.Messages.route){
                 MessageScreen(
                     currentUserUid = currentUser.uid,
-                    messagingViewModel = messagingViewModel
+                    messagingViewModel = messagingViewModel,
+                    goToChatRoom = {roomUid ->
+                        navController.navigate(Screen.SingleChatRoom.createRoute(roomUid))
+                    }
                 )
             }
 
@@ -215,6 +219,17 @@ fun NavigationHost(
                     friendsList = currentUser.friends,
                     currentUserProfileDetailsViewModel = currentUserProfileDetailsViewModel,
                     goToFriendRequest = {navController.navigate(Screen.FriendRequest.route)}
+                )
+            }
+
+            composable(Screen.SingleChatRoom.route){
+
+                val chatRoomUID = it.arguments?.getString("chatRoomUID")
+
+                SingleChatRoom(
+                    chatRoomUid = chatRoomUID!!,
+                    currentUserUid = currentUser.uid,
+                    messagingViewModel = messagingViewModel
                 )
             }
         }

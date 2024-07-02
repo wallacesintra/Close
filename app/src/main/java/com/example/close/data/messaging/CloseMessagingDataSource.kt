@@ -7,7 +7,6 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.toObject
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import java.util.UUID
@@ -51,10 +50,10 @@ class CloseMessagingDataSource(
         val deferred = CompletableDeferred<Unit>()
 
         val newMessage = hashMapOf(
-            "messageUid" to UUID.randomUUID().timestamp(),
+            "messageUid" to UUID.randomUUID().toString(),
             "senderUid" to senderUid,
             "message" to textMessage,
-            "timeStamp" to FieldValue.serverTimestamp(),
+//            "timeStamp" to FieldValue.serverTimestamp(),
             )
 
         firestoreDb.collection(closeChatsCollection).document(roomUid)
@@ -73,7 +72,30 @@ class CloseMessagingDataSource(
         }
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
+
+    override suspend fun getChatRoomByChatRoomUid(chatroomUid: String): CloseChatRoom  = withContext(Dispatchers.IO){
+        suspendCancellableCoroutine { continuation ->
+            firestoreDb.collection(closeChatsCollection).document(chatroomUid)
+                .addSnapshotListener { value, error ->
+                    if (error != null){
+                        if (continuation.isActive){
+                            continuation.resumeWithException(error)
+                        }
+                    }
+
+                    val chatRoom = value!!.toObject<CloseChatRoom>()
+
+                    continuation.resume(
+                        CloseChatRoom(
+                        chatUid = chatRoom!!.chatUid,
+                        members = chatRoom.members,
+                        messages = chatRoom.messages
+                    )
+                    )
+                }
+        }
+    }
+
     override suspend fun getChatRoomsForUid(userUid: String): List<CloseChatRoom> = withContext(Dispatchers.IO){
         suspendCancellableCoroutine { continuation ->
             firestoreDb.collection(closeChatsCollection)
