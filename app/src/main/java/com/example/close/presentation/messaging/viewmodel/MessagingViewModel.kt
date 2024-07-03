@@ -25,8 +25,11 @@ class MessagingViewModel(
     private val closeUserDataSource: CloseUserDataSource
 ): ViewModel() {
 
-    var chatRoomsState: ChatRoomsState by mutableStateOf(ChatRoomsState.Loading)
-    var messageState: MessageState by mutableStateOf(MessageState.Loading)
+//    var chatRoomsState: ChatRoomsState by mutableStateOf(ChatRoomsState.Loading)
+var chatRoomsState: ChatRoomsState by mutableStateOf(ChatRoomsState.Success(chatRoomList = emptyList()))
+
+    //    var messageState: MessageState by mutableStateOf(MessageState.Loading)
+    var messageState: MessageState by mutableStateOf(MessageState.Success(messagesList = emptyList()))
 
     fun sendMessage(roomUid: String, senderUid: String, textMessage:String){
         viewModelScope.launch(Dispatchers.IO) {
@@ -37,7 +40,7 @@ class MessagingViewModel(
     fun getCurrentUserChatRooms(currentUserUid: String){
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                chatRoomsState = ChatRoomsState.Loading
+//                chatRoomsState = ChatRoomsState.Loading
 
                 val chatRoomList = closeMessagingDataSource.getChatRoomsForUid(userUid = currentUserUid)
                 val closeChatRoomLIstUI = mutableListOf<CloseChatRoomUI>()
@@ -74,9 +77,7 @@ class MessagingViewModel(
     fun getChatRoomByChatUid(chatRoom: String){
         viewModelScope.launch {
             try {
-
-                messageState = MessageState.Loading
-
+//                messageState = MessageState.Loading
                 val currentChatRoom = closeMessagingDataSource.getChatRoomByChatRoomUid(chatroomUid = chatRoom)
 
                 val messagesList = mutableListOf<MessageUI>()
@@ -94,7 +95,7 @@ class MessagingViewModel(
                 }
 
                 messageState = try {
-                    MessageState.Success(messagesList = messagesList)
+                    MessageState.Success(messagesList = messagesList.reversed())
                 }catch (e: Exception){
                     MessageState.Error(e.message!!)
                 }

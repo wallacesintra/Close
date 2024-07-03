@@ -10,6 +10,9 @@ interface CloseMessaging {
 
     suspend fun getChatRoomByChatRoomUid(chatroomUid: String): CloseChatRoom
 
+//    suspend fun getChatRoomByChatRoomUid(chatroomUid: String): Flow<CloseChatRoom>
+
+
     suspend fun getChatRoomsForUid(userUid: String): List<CloseChatRoom>
 
 

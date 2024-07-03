@@ -125,6 +125,28 @@ class CloseMessagingDataSource(
 //        }
 //    }
 
+//    override suspend fun getChatRoomByChatRoomUid(chatroomUid: String): Flow<CloseChatRoom> = withContext(Dispatchers.IO) {
+//        flow {
+//            val registration = firestoreDb.collection(closeChatsCollection).document(chatroomUid)
+//                .addSnapshotListener { value, error ->
+//                    if (error != null) {
+//                        throw error
+//                    } else {
+//                        val chatRoom = value?.toObject<CloseChatRoom>()
+//                        if (chatRoom != null) {
+//                            emit(chatRoom)
+//                        } else {
+//                            throw KotlinNullPointerException("ChatRoom is null")
+//                        }
+//                    }
+//                }
+//
+//            awaitClose {
+//                registration.remove()
+//            }
+//        }
+//    }
+
 
     override suspend fun getChatRoomByChatRoomUid(chatroomUid: String): CloseChatRoom = withContext(Dispatchers.IO) {
         suspendCancellableCoroutine { continuation ->

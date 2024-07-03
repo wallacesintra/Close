@@ -22,7 +22,7 @@ fun ChatBubble(
 ){
     Box(
         modifier = Modifier
-            .padding(vertical = 10.dp)
+            .padding(vertical = 4.dp)
             .clip(RoundedCornerShape(10.dp))
             .background(
                 if (messageUI.sender.uid == currentUserUid) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground.copy(

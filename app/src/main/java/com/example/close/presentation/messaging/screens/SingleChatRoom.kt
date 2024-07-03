@@ -29,6 +29,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.close.R
+import com.example.close.presentation.components.LargeText
 import com.example.close.presentation.components.Loading
 import com.example.close.presentation.messaging.components.ChatBubble
 import com.example.close.presentation.messaging.models.MessageState
@@ -42,7 +43,7 @@ fun SingleChatRoom(
 ){
     val messageState = messagingViewModel.messageState
 
-    var text: String by remember {
+    var message: String by remember {
         mutableStateOf("")
     }
 
@@ -53,10 +54,11 @@ fun SingleChatRoom(
     Box(modifier = Modifier.fillMaxHeight()) {
         Column(
             modifier = Modifier
-                //            .weight(1.0f)
                 .padding(10.dp)
         ) {
-            Text(text = "Chat room")
+
+            LargeText(text = stringResource(id = R.string.messages), modifier = Modifier.padding(vertical = 10.dp))
+
             when (messageState) {
                 is MessageState.Error -> {
                     Text(text = messageState.error)
@@ -68,35 +70,29 @@ fun SingleChatRoom(
 
                 is MessageState.Success -> {
                     val list = messageState.messagesList
-                    //                Text(text = messageState.messagesList.size.toString())
                     LazyColumn(
+                        reverseLayout = true,
                         modifier = Modifier
                             .weight(1.0f)
                             .padding(bottom = 70.dp)
                     ) {
                         items(list) { message ->
-                            //                        Text(text = "${i.sender.username}: ${i.message}")
                             ChatBubble(currentUserUid = currentUserUid, messageUI = message)
                         }
                     }
                 }
             }
-
-
-            //        Button(onClick = { messagingViewModel.sendMessage(roomUid = chatRoomUid, senderUid = currentUserUid, textMessage = text) }) {
-            //            Text(text = "send text")
-            //        }
         }
 
         Box(modifier = Modifier
+            .padding(5.dp)
             .align(Alignment.BottomCenter)
             .fillMaxWidth()) {
-//            TextField(value = text, onValueChange = { text = it }, modifier = Modifier.fillMaxWidth())
             TextField(
-                value = text,
+                value = message,
                 placeholder = { Text(text = stringResource(id = R.string.message))},
                 onValueChange = {
-                    text = it
+                    message = it
                 },
                 shape = RoundedCornerShape(40.dp),
                 colors = TextFieldDefaults.colors(
@@ -107,13 +103,15 @@ fun SingleChatRoom(
                     IconButton(
                         modifier = Modifier.padding(4.dp),
                         onClick = {
-                            if (text.isNotEmpty()){
+                            if (message.isNotEmpty()){
                                 messagingViewModel.sendMessage(
                                     roomUid =chatRoomUid,
                                     senderUid =currentUserUid,
-                                    textMessage = text
+                                    textMessage = message
                                 )
                             }
+
+                            message = ""
                         },
                         colors = IconButtonDefaults.iconButtonColors(
                             contentColor = MaterialTheme.colorScheme.onPrimary,

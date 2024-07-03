@@ -22,7 +22,6 @@ fun GoBack(
         colors = IconButtonDefaults.iconButtonColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer
         ),
-//        modifier = Modifier.padding(8.dp)
     ) {
         Icon(
             imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
