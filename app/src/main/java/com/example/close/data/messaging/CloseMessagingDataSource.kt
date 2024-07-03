@@ -73,60 +73,120 @@ class CloseMessagingDataSource(
     }
 
 
-    override suspend fun getChatRoomByChatRoomUid(chatroomUid: String): CloseChatRoom  = withContext(Dispatchers.IO){
+    override suspend fun getChatRoomsForUid(userUid: String): List<CloseChatRoom> = withContext(Dispatchers.IO) {
         suspendCancellableCoroutine { continuation ->
-            firestoreDb.collection(closeChatsCollection).document(chatroomUid)
-                .addSnapshotListener { value, error ->
-                    if (error != null){
-                        if (continuation.isActive){
-                            continuation.resumeWithException(error)
-                        }
-                    }
+            var hasResumed = false // Track if the continuation has already been resumed
 
-                    val chatRoom = value!!.toObject<CloseChatRoom>()
-
-                    continuation.resume(
-                        CloseChatRoom(
-                        chatUid = chatRoom!!.chatUid,
-                        members = chatRoom.members,
-                        messages = chatRoom.messages
-                    )
-                    )
-                }
-        }
-    }
-
-    override suspend fun getChatRoomsForUid(userUid: String): List<CloseChatRoom> = withContext(Dispatchers.IO){
-        suspendCancellableCoroutine { continuation ->
-            firestoreDb.collection(closeChatsCollection)
+            val listenerRegistration = firestoreDb.collection(closeChatsCollection)
                 .whereArrayContains("members", userUid)
                 .addSnapshotListener { value, error ->
-                    if (error != null){
-                        if (continuation.isActive){
+                    if (error != null) {
+                        if (!hasResumed) {
                             continuation.resumeWithException(error)
+                            hasResumed = true
                         }
-                        Log.w("CloseChat: message listener", "listen failed, $error")
-                        continuation.resume(emptyList())
+                        return@addSnapshotListener
                     }
 
-                    val chatRoomList = mutableListOf<CloseChatRoom>()
-
-                    for (doc in value!!){
-                        val chatRoom = doc.toObject<CloseChatRoom>()
-
-                        chatRoomList.add(
-                            CloseChatRoom(
-                                chatUid = chatRoom.chatUid,
-                                members = chatRoom.members,
-                                messages = chatRoom.messages
-                            )
-                        )
+                    if (!hasResumed) {
+                        val chatRoomList = value?.documents?.mapNotNull { it.toObject<CloseChatRoom>() } ?: emptyList()
+                        continuation.resume(chatRoomList)
+                        hasResumed = true
                     }
-                    Log.d("CloseChat: message listener", " listen successful")
-                    continuation.resume(chatRoomList)
                 }
+
+            // Optionally, if you want to remove the listener after resuming to prevent memory leaks
+            continuation.invokeOnCancellation {
+                listenerRegistration.remove()
+            }
         }
     }
+
+
+//    override suspend fun getChatRoomByChatRoomUid(chatroomUid: String): CloseChatRoom  = withContext(Dispatchers.IO){
+//        suspendCancellableCoroutine { continuation ->
+//            firestoreDb.collection(closeChatsCollection).document(chatroomUid)
+//                .get()
+//                .addOnSuccessListener { room ->
+//                    val chatRoom = room.toObject<CloseChatRoom>()
+//
+//                    continuation.resume(
+//                        CloseChatRoom(
+//                            chatUid = chatRoom!!.chatUid,
+//                            members = chatRoom.members,
+//                            messages = chatRoom.messages,
+//                        )
+//                    )
+//                }
+//                .addOnFailureListener { e ->
+//                    Log.w("CloseChat: Get Room details", "details fetched successful")
+//                    continuation.resumeWithException(e)
+//                }
+//        }
+//    }
+
+
+    override suspend fun getChatRoomByChatRoomUid(chatroomUid: String): CloseChatRoom = withContext(Dispatchers.IO) {
+        suspendCancellableCoroutine { continuation ->
+            var hasResumed = false // Flag to track if the continuation has been resumed
+
+            // Registering the snapshot listener
+            val registration = firestoreDb.collection(closeChatsCollection).document(chatroomUid)
+                .addSnapshotListener { value, error ->
+                    if (!hasResumed) { // Check if the continuation has not been resumed yet
+                        if (error != null) {
+                            continuation.resumeWithException(error)
+                        } else {
+                            val chatRoom = value?.toObject<CloseChatRoom>()
+                            if (chatRoom != null) {
+                                continuation.resume(chatRoom)
+                            } else {
+                                continuation.resumeWithException(KotlinNullPointerException("ChatRoom is null"))
+                            }
+                        }
+                        hasResumed = true // Mark the continuation as resumed
+//                        registration.remove() // Remove the listener to prevent further updates
+                    }
+                }
+
+            // Optionally, remove the listener when the coroutine is cancelled
+            continuation.invokeOnCancellation {
+                registration.remove()
+            }
+        }
+    }
+
+//    override suspend fun getChatRoomsForUid(userUid: String): List<CloseChatRoom> = withContext(Dispatchers.IO){
+//        suspendCancellableCoroutine { continuation ->
+//            firestoreDb.collection(closeChatsCollection)
+//                .whereArrayContains("members", userUid)
+//                .addSnapshotListener { value, error ->
+//                    if (error != null){
+//                        if (continuation.isActive){
+//                            continuation.resumeWithException(error)
+//                        }
+//                        Log.w("CloseChat: message listener", "listen failed, $error")
+//                        continuation.resume(emptyList())
+//                    }
+//
+//                    val chatRoomList = mutableListOf<CloseChatRoom>()
+//
+//                    for (doc in value!!){
+//                        val chatRoom = doc.toObject<CloseChatRoom>()
+//
+//                        chatRoomList.add(
+//                            CloseChatRoom(
+//                                chatUid = chatRoom.chatUid,
+//                                members = chatRoom.members,
+//                                messages = chatRoom.messages
+//                            )
+//                        )
+//                    }
+//                    Log.d("CloseChat: message listener", " listen successful")
+//                    continuation.resume(chatRoomList)
+//                }
+//        }
+//    }
 
 
 }

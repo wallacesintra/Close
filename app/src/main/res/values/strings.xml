@@ -47,5 +47,7 @@
     <string name="friends">Friends</string>
 
     <string name="chats">Chats</string>
+    <string name="message">Message</string>
+    <string name="send_message">Send the message</string>
 
 </resources>
