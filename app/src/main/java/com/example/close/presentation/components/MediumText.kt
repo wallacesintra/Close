@@ -5,16 +5,22 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.sp
 
 @Composable
 fun MediumText(
     text: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isBold: Boolean = false,
+    centerText: Boolean = false,
+    fontSize: TextUnit = 16.sp
 ){
     Text(
         text = text,
-        textAlign = TextAlign.Center,
-        fontWeight = FontWeight.W600,
-        modifier = modifier
+        textAlign = if (centerText) TextAlign.Center else TextAlign.Start,
+        fontWeight = if (isBold) FontWeight.Bold else FontWeight.W300,
+        modifier = modifier,
+        fontSize = fontSize
     )
 }

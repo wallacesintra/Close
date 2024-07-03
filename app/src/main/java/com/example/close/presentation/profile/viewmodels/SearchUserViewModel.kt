@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import com.example.close.data.database.CloseUserDataSource
-import com.example.close.data.database.models.CloseUsers
+import com.example.close.data.database.models.CloseUser
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import androidx.lifecycle.viewModelScope
@@ -24,7 +24,7 @@ class SearchUserViewModel(
     private val _isSearching = MutableStateFlow(false)
     val isSearching = _isSearching.asStateFlow()
 
-    private val _closeUsers = MutableStateFlow<List<CloseUsers>>(emptyList())
+    private val _closeUser = MutableStateFlow<List<CloseUser>>(emptyList())
 
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
     val closeUsers = searchText
@@ -32,7 +32,7 @@ class SearchUserViewModel(
         .onEach { _isSearching.value = true }
         .flatMapLatest { text ->
             if(text.isBlank()) {
-                flowOf(_closeUsers.value)
+                flowOf(_closeUser.value)
             } else {
                 flow {
                     emit(closeUserDataSource.findUserByUsername(username = text.trim()))
@@ -43,7 +43,7 @@ class SearchUserViewModel(
         .stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(5000),
-            _closeUsers.value
+            _closeUser.value
         )
 
     fun onSearchTextChange(text: String) {

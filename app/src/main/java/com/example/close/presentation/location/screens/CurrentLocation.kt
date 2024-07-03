@@ -3,6 +3,7 @@ package com.example.close.presentation.location.screens
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
+import com.example.close.presentation.components.Loading
 import com.example.close.presentation.location.components.MapView
 import com.example.close.presentation.location.models.LocationState
 import com.google.android.gms.maps.model.LatLng
@@ -19,7 +20,8 @@ fun CurrentLocation(
 
     when(locationState){
         LocationState.Error -> Text(text = "error......")
-        LocationState.Loading -> Text(text = "loading.....")
+        LocationState.Loading -> { Loading() }
+
         is LocationState.Success -> {
             val location = locationState.locationDetails
             

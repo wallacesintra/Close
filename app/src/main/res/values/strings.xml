@@ -42,4 +42,13 @@
 
     <string name="confirm_request">Confirm Friend Request</string>
 
+    <string name="your_friends">Your Friends</string>
+    <string name="friend_requests">Friend Requests</string>
+    <string name="friends">Friends</string>
+
+    <string name="chats">Chats</string>
+    <string name="message">Message</string>
+    <string name="messages">Messages</string>
+    <string name="send_message">Send the message</string>
+
 </resources>

@@ -11,7 +11,7 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.close.CloseApp
 import com.example.close.data.database.CloseUserDataSource
-import com.example.close.data.database.models.CloseUsers
+import com.example.close.data.database.models.CloseUser
 import com.example.close.presentation.friends.models.CloseUserState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -34,7 +34,7 @@ class CloseUserViewModel(
 
                 closeUserState = try {
                     CloseUserState.Success(
-                        userDetails = CloseUsers(
+                        userDetails = CloseUser(
                             uid = details.uid,
                             username = details.username,
                             bio = details.bio,

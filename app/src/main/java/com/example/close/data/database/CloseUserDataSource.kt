@@ -1,17 +1,14 @@
 package com.example.close.data.database
 
 import android.util.Log
-import com.example.close.data.database.models.CloseUsers
+import com.example.close.data.database.models.CloseUser
 import com.example.close.data.database.models.FriendRequest
 import com.example.close.presentation.models.CloseUserData
-import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.toObject
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import kotlin.coroutines.resume
@@ -88,8 +85,8 @@ class CloseUserDataSource(
         }
     }
 
-    override suspend fun findUserByUsername(username: String): List<CloseUsers> = withContext(Dispatchers.IO) {
-        suspendCancellableCoroutine<List<CloseUsers>> { continuation ->
+    override suspend fun findUserByUsername(username: String): List<CloseUser> = withContext(Dispatchers.IO) {
+        suspendCancellableCoroutine<List<CloseUser>> { continuation ->
             firestoreDb.collection("closeUsers")
                 .orderBy("username")
                 .startAt(username)
@@ -97,10 +94,10 @@ class CloseUserDataSource(
                 .get()
                 .addOnSuccessListener { users ->
                     Log.d("firestore: find by username", "searching")
-                    val closeUsersList = mutableListOf<CloseUsers>()
+                    val closeUserList = mutableListOf<CloseUser>()
                     for(i in users){
                         val user = i.toObject<CloseUserData>()
-                        closeUsersList.add(CloseUsers(
+                        closeUserList.add(CloseUser(
                             uid = user.uid,
                             username = user.username,
                             bio = user.bio,
@@ -108,7 +105,7 @@ class CloseUserDataSource(
                         ))
                         Log.d("firestore: find by username", "users found" + i.data)
                     }
-                    continuation.resume(closeUsersList)
+                    continuation.resume(closeUserList)
                 }
                 .addOnFailureListener {e ->
                     Log.w("firestore: find by username", "user not found" + e.message)
@@ -117,13 +114,13 @@ class CloseUserDataSource(
         }
     }
 
-    override suspend fun getCloseUserByUid(closeUid: String): CloseUsers {
-        val deferred = CompletableDeferred<CloseUsers>()
+    override suspend fun getCloseUserByUid(closeUid: String): CloseUser {
+        val deferred = CompletableDeferred<CloseUser>()
 
         firestoreDb.collection("closeUsers").document(closeUid)
             .get()
             .addOnSuccessListener { user ->
-                val userData = user.toObject<CloseUsers>()
+                val userData = user.toObject<CloseUser>()
                 Log.d("firestore:get user: successful", "user uid: " + userData?.username)
 
                 if (userData != null){
@@ -163,7 +160,6 @@ class CloseUserDataSource(
     override suspend fun sendFriendRequest(senderUid: String, receiverUid: String){
         val deferred = CompletableDeferred<Unit>()
         val requestUid = "$senderUid$receiverUid"
-        val timeStamp = FieldValue.serverTimestamp()
 
         val newRequest = hashMapOf(
             "requestUid" to requestUid,
@@ -196,6 +192,7 @@ class CloseUserDataSource(
                     .whereEqualTo("receiverUid", receiverUid)
                     .get()
                     .addOnSuccessListener { friendRequests ->
+
                         val requests = mutableListOf<FriendRequest>()
 
                         for (i in friendRequests) {
@@ -207,6 +204,7 @@ class CloseUserDataSource(
                                     requestUid = friendRequest.requestUid,
                                     receiverUid = friendRequest.receiverUid,
                                     senderUid = friendRequest.senderUid,
+                                    accepted = friendRequest.accepted
 //                                    timeStamp = friendRequest.timeStamp
 //                                    timeStamp = timestampLong
                                 )

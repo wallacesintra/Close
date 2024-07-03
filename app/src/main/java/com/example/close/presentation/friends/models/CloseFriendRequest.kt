@@ -4,5 +4,5 @@ data class CloseFriendRequest(
     val requestUid: String = "",
     val senderUid: String = "",
     val senderUsername: String = "",
-    val response: Boolean? = null
+    var response: Boolean? = null
 )

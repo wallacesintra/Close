@@ -11,11 +11,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.close.R
 import com.example.close.presentation.components.LargeActionContainer
-import com.example.close.presentation.components.ProfileImg
 import com.example.close.presentation.components.LargeText
 import com.example.close.presentation.components.MediumText
+import com.example.close.presentation.components.ProfileImg
 import com.example.close.presentation.models.CloseUserData
 
 @Composable
@@ -31,11 +32,11 @@ fun ProfileScreen(
         modifier = Modifier
             .fillMaxSize()
     ) {
-        ProfileImg(imgSize = 120.dp, modifier = Modifier.padding(20.dp))
+        ProfileImg(imgSize = 120.dp, modifier = Modifier.padding(10.dp))
 
-        LargeText(text = userData.username)
+        LargeText(text = userData.username, isBold = true, fontSize = 30.sp, modifier = Modifier.padding(bottom = 10.dp))
 
-        MediumText(text = userData.bio)
+        MediumText(text = userData.bio, fontSize = 14.sp)
 
 
         Spacer(modifier = Modifier.padding(12.dp))

@@ -42,7 +42,7 @@ fun MapView(locationDetails: LocationDetails, friendLocation: List<LatLng> = emp
                 radius = 200.00,
                 strokeWidth = 1.0f,
                 strokeColor = MaterialTheme.colorScheme.tertiary,
-                fillColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.2f)
+                fillColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f)
             )
             Marker(
                 state = MarkerState(position = currentUserLocation),
