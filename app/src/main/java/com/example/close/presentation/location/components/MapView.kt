@@ -5,13 +5,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.close.R
 import com.example.close.presentation.components.Loading
-import com.example.close.presentation.location.models.FriendLocation
 import com.example.close.presentation.location.models.LocationDetails
 import com.example.close.presentation.location.models.SharingState
 import com.example.close.utils.ConvertImgToBitmapDescriptor
@@ -26,14 +24,8 @@ import com.google.maps.android.compose.rememberCameraPositionState
 @Composable
 fun MapView(
     locationDetails: LocationDetails,
-    friendLocation: List<FriendLocation> = emptyList(),
-    loadFriendsLocation: () -> Unit = {},
     sharingState: SharingState
 ) {
-
-    LaunchedEffect(key1 = Unit) {
-        loadFriendsLocation()
-    }
 
     val context = LocalContext.current
 
@@ -70,12 +62,13 @@ fun MapView(
                 is SharingState.Success -> {
                     if (sharingState.friendsLocationList.isNotEmpty()){
                         for (location in sharingState.friendsLocationList){
+
+                            val friendLocation =
+                                location.locationCoordinates?.let { LatLng(it.latitude, location.locationCoordinates.longitude) }
                             Marker(
-                                state = MarkerState(position = location.locationCoordinates!!),
+                                state = MarkerState(position = friendLocation!!),
                                 icon = markerIcon,
                                 title = location.closerUser.username,
-//                    tag = "friend tag",
-//                    onClick = { true},
                                 onInfoWindowLongClick = { Log.i("Location onClick", "Location clicked")}
                             )
                         }

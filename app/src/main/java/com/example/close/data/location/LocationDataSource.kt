@@ -20,9 +20,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import java.util.concurrent.atomic.AtomicBoolean
+import kotlin.coroutines.resume
 
 class LocationDataSource(
     private val context: Context,
@@ -116,6 +118,75 @@ class LocationDataSource(
            }
     }
 
+//    override suspend fun getFriendsLocationNotFlow(userUID: String): List<FriendLocationDetail> = withContext(Dispatchers.IO) {
+//        suspendCancellableCoroutine { continuation ->
+//            firestoreDB.collection(closeFriendsLocation).document(userUID)
+//                .get()
+//                .addOnSuccessListener { locations ->
+//
+//                    val container = locations.toObject<FriendsLocation>()
+//
+//                    if (container != null) {
+//                        continuation.resume(container.friendsLocationList)
+//                    }
+//                }
+//                .addOnFailureListener { e ->
+//                    Log.w("Location Sharing", "get locations failed " + e.message)
+//                    continuation.resume(emptyList())
+//                }
+//
+//        }
+//    }
+
+//    override suspend fun getFriendsLocationNotFlow(userUID: String): List<FriendLocationDetail> = withContext(Dispatchers.IO) {
+//        suspendCancellableCoroutine { continuation ->
+//            firestoreDB.collection(closeFriendsLocation).document(userUID)
+//                .get()
+//                .addOnSuccessListener { documentSnapshot ->
+//                    if (documentSnapshot.exists()) {
+//                        val container = documentSnapshot.toObject(FriendsLocation::class.java)
+//                        container?.let {
+//                            continuation.resume(it.friendsLocationList)
+//                        } ?: continuation.resume(emptyList())
+//                    } else {
+//                        Log.w("Location Sharing", "No document found for userUID: $userUID")
+//                        continuation.resume(emptyList())
+//                    }
+//                }
+//                .addOnFailureListener { e ->
+//                    Log.w("Location Sharing", "get locations failed: ${e.message}")
+//                    continuation.resume(emptyList())
+//                }
+//        }
+//    }
+
+    override suspend fun getFriendsLocationNotFlow(userUID: String): List<FriendLocationDetail> = withContext(Dispatchers.IO) {
+        suspendCancellableCoroutine { continuation ->
+            if (userUID.isBlank()) {
+                Log.w("Location Sharing", "Invalid userUID: $userUID")
+                continuation.resume(emptyList())
+                return@suspendCancellableCoroutine
+            }
+
+            firestoreDB.collection(closeFriendsLocation).document(userUID)
+                .get()
+                .addOnSuccessListener { documentSnapshot ->
+                    if (documentSnapshot.exists()) {
+                        val container = documentSnapshot.toObject(FriendsLocation::class.java)
+                        container?.let {
+                            continuation.resume(it.friendsLocationList)
+                        } ?: continuation.resume(emptyList())
+                    } else {
+                        Log.w("Location Sharing", "No document found for userUID: $userUID")
+                        continuation.resume(emptyList())
+                    }
+                }
+                .addOnFailureListener { e ->
+                    Log.w("Location Sharing", "get locations failed: ${e.message}")
+                    continuation.resume(emptyList())
+                }
+        }
+    }
 
     /**
      * document that holds locations of users friends location

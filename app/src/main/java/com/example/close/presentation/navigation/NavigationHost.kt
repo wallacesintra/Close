@@ -3,6 +3,7 @@ package com.example.close.presentation.navigation
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -16,9 +17,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -99,24 +102,41 @@ fun NavigationHost(
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Screens.forEach {screen ->
-                            IconButton(
-                                colors = IconButtonColors(
-                                    containerColor = if (currentDestination?.hierarchy?.any { it.route ==  screen.route} == true)
-                                        MaterialTheme.colorScheme.primary else Color.Transparent,
-                                    contentColor = if (currentDestination?.hierarchy?.any { it.route ==  screen.route} == true)
-                                        MaterialTheme.colorScheme.background else MaterialTheme.colorScheme.primary,
-                                    disabledContainerColor = Color.Transparent,
-                                    disabledContentColor = MaterialTheme.colorScheme.primary
-                                ),
-                                onClick = {
-                                    navController.navigate(screen.route){
-                                        popUpTo(navController.graph.findStartDestination().id){
-                                            saveState = true
+                            Column(
+                                verticalArrangement = Arrangement.Center,
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                modifier = Modifier.padding(4.dp)
+                            ) {
+                                IconButton(
+                                    colors = IconButtonColors(
+                                        containerColor = if (currentDestination?.hierarchy?.any { it.route == screen.route } == true)
+                                            MaterialTheme.colorScheme.primary else Color.Transparent,
+                                        contentColor = if (currentDestination?.hierarchy?.any { it.route == screen.route } == true)
+                                            MaterialTheme.colorScheme.background else MaterialTheme.colorScheme.primary,
+                                        disabledContainerColor = Color.Transparent,
+                                        disabledContentColor = MaterialTheme.colorScheme.primary
+                                    ),
+                                    onClick = {
+                                        navController.navigate(screen.route) {
+                                            popUpTo(navController.graph.findStartDestination().id) {
+                                                saveState = true
+                                            }
+                                            launchSingleTop = true
+                                            restoreState = true
                                         }
-                                        launchSingleTop = true
-                                        restoreState = true
-                                    }}) {
-                                Icon(painter = painterResource(id = screen.icon!!), contentDescription = "navigate to ${screen.route}")
+                                    }) {
+                                    Icon(
+                                        painter = painterResource(id = screen.icon!!),
+                                        contentDescription = "navigate to ${screen.route}"
+                                    )
+                                }
+
+//                                Text(
+//                                    text = screen.screenLabel!!,
+//                                    fontSize = 15.sp,
+//                                    color = MaterialTheme.colorScheme.primary
+//                                )
+
                             }
                         }
                     }
@@ -191,6 +211,7 @@ fun NavigationHost(
                     friendsList = currentUser.friends,
                     currentUserUID = currentUser.uid
                 )
+
             }
 
             composable(
@@ -220,7 +241,7 @@ fun NavigationHost(
                     currentUserUid = currentUser.uid,
                     messagingViewModel = messagingViewModel,
                     goToChatRoom = {roomUid ->
-                        navController.navigate(Screen.SingleChatRoom.createRoute(roomUid!!))
+                        navController.navigate(Screen.SingleChatRoom.createRoute(roomUid))
                     }
                 )
             }

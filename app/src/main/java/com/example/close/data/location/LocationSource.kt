@@ -10,6 +10,8 @@ interface LocationSource {
 
     suspend fun getFriendsLocation(userUID: String): Flow<List<FriendLocationDetail>>
 
+    suspend fun getFriendsLocationNotFlow(userUID: String): List<FriendLocationDetail>
+
     suspend fun createLocationContainer(userUID: String)
 
     suspend fun shareLocation(friendUID: String, friendsLocationDetail: FriendLocationDetail)

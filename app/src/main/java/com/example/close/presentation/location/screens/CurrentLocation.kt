@@ -1,14 +1,14 @@
 package com.example.close.presentation.location.screens
 
+import android.util.Log
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.platform.LocalContext
+import com.example.close.data.location.model.LocationModel
 import com.example.close.presentation.components.Loading
 import com.example.close.presentation.location.components.MapView
 import com.example.close.presentation.location.models.LocationState
 import com.example.close.presentation.location.viewmodel.LocationViewModel
-import com.google.android.gms.maps.model.LatLng
 
 
 @Composable
@@ -16,22 +16,17 @@ fun CurrentLocation(
     currentUserUID: String,
     friendsList: List<String>,
     locationViewModel: LocationViewModel
-
 ){
     val locationState = locationViewModel.locationState
 
     val sharingState = locationViewModel.sharingState
 
     LaunchedEffect(key1 = Unit) {
-//        locationViewModel.createLocationContainer(userUID = currentUserUID)
-        locationViewModel.receiveLocationsFromFriends(userUID = currentUserUID)
         locationViewModel.getCurrentLocation()
-//        sharingLocationViewModel.shareLocationToFriends(userUID = , friendsLIst = , locationDetail = )
+        Log.w("user uid compose",currentUserUID)
+        locationViewModel.receiveLocationsFromFriends(userUID = currentUserUID)
     }
 
-
-
-    val context = LocalContext.current
 
 
     when(locationState){
@@ -41,7 +36,14 @@ fun CurrentLocation(
         is LocationState.Success -> {
             val location = locationState.locationDetails
 
-            val currentLocation = LatLng(location.lat, location.long)
+//            val currentLocation = LatLng(location.lat, location.long)
+            val currentLocation = LocationModel(
+                latitude = locationState.locationDetails.lat,
+                longitude = locationState.locationDetails.long
+            )
+
+
+//            locationViewModel.shareLocationToFriends(userUID = currentUserUID , friendsLIst = friendsList, locationDetail = currentLocation)
 
             locationViewModel.shareLocationToFriends(
                 userUID = currentUserUID,

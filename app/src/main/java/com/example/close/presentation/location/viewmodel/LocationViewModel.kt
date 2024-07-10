@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
@@ -21,7 +20,6 @@ import com.example.close.presentation.location.models.FriendLocation
 import com.example.close.presentation.location.models.LocationDetails
 import com.example.close.presentation.location.models.LocationState
 import com.example.close.presentation.location.models.SharingState
-import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -29,7 +27,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class LocationViewModel(
-    private val savedStateHandle: SavedStateHandle,
     private val locationDataSource: LocationDataSource,
     private val closeUserDataSource: CloseUserDataSource,
 ): ViewModel() {
@@ -51,7 +48,6 @@ class LocationViewModel(
 
     init {
         getCurrentLocation()
-
     }
 
     fun createLocationContainer(userUID: String){
@@ -105,7 +101,7 @@ class LocationViewModel(
      * @param friendsLIst: friends uid list
      * @param locationDetail: location latitude and longitude
      */
-    fun shareLocationToFriends(userUID: String,  friendsLIst: List<String>,locationDetail: LatLng){
+    fun shareLocationToFriends(userUID: String,  friendsLIst: List<String>,locationDetail: LocationModel){
 
         viewModelScope.launch(Dispatchers.IO){
             val userLocationDetail = FriendLocationDetail(
@@ -116,9 +112,6 @@ class LocationViewModel(
             for (friendUID in friendsLIst){
 
                 Log.d("location sharing", "location fetched $friendUID")
-
-//                locationDataSource.checkIfLocationContainerContainer()
-                createLocationContainer(friendUID)
 
                 locationDataSource.shareLocation(
                     friendUID = friendUID,
@@ -135,37 +128,30 @@ class LocationViewModel(
      *
      * @param userUID current user uid
      */
-    fun receiveLocationsFromFriends(userUID: String){
+    fun receiveLocationsFromFriends(userUID: String) {
+        Log.d("LocationSharing", "Attempting to receive locations for user $userUID")
         viewModelScope.launch(Dispatchers.IO) {
             try {
-
-                sharingState = try {
-                    val friendsLocationList = mutableListOf<FriendLocation>()
-
-                    locationDataSource.getFriendsLocation(userUID = userUID).collect { list ->
-                        for(i in list){
-                            val user = closeUserDataSource.getCloseUserByUid(i.userUID)
-
-                            friendsLocationList.add(
-                                FriendLocation(
-                                    closerUser = user,
-                                    locationCoordinates = i.locationDetail!!
-                                )
+                val friendsLocationList = mutableListOf<FriendLocation>()
+                val locationList = locationDataSource.getFriendsLocationNotFlow(userUID = userUID)
+                locationList.forEach { location ->
+                    closeUserDataSource.getCloseUserByUid(closeUid = location.userUID).let { user ->
+                        friendsLocationList.add(
+                            FriendLocation(
+                                closerUser = user,
+                                locationCoordinates = location.locationDetail
                             )
-                        }
+                        )
                     }
-
-                    SharingState.Success(friendsLocationList = friendsLocationList)
-
-                }catch (e: Exception){
-                    SharingState.Error(e.message!!)
                 }
-            }catch (e: Exception){
-                sharingState = SharingState.Error(error = e.message!!)
+                Log.d("LocationSharing", "Successfully received ${friendsLocationList.size} locations")
+                sharingState = SharingState.Success(friendsLocationList = friendsLocationList)
+            } catch (e: Exception) {
+                Log.e("LocationSharing", "Error receiving locations: ${e.message}", e)
+                sharingState = SharingState.Error(error = e.message ?: "Unknown error")
             }
         }
     }
-
 
     companion object {
         val factory: ViewModelProvider.Factory = viewModelFactory {
@@ -177,7 +163,6 @@ class LocationViewModel(
 
 
                 LocationViewModel(
-                    savedStateHandle = savedStateHandle,
                     locationDataSource = locationDataSource,
                     closeUserDataSource = closeUserDataSource
                 )

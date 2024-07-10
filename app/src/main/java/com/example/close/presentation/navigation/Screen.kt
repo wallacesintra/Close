@@ -6,22 +6,27 @@ import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import com.example.close.R
 
-sealed class Screen(val route: String, val navArguments: List<NamedNavArgument> = emptyList(), @DrawableRes val  icon: Int? = null){
+sealed class Screen(
+    val route: String,
+    val navArguments: List<NamedNavArgument> = emptyList(),
+    @DrawableRes val icon: Int? = null,
+    val screenLabel: String? = null
+){
     data object AuthMain: Screen("AuthMain")
 
     data object SignIn: Screen("SignIn")
 
     data object SignUp: Screen("SignUp")
 
-    data object Profile: Screen("Profile", icon = R.drawable.person)
+    data object Profile: Screen("Profile", icon = R.drawable.person, screenLabel = "Profile")
 
     data object EditProfile: Screen("EditProfile")
 
-    data object Location: Screen("location", icon = R.drawable.map)
+    data object Location: Screen("location", icon = R.drawable.map, screenLabel = "Map")
 
-    data object SearchUser: Screen("SearchUsers", icon = R.drawable.search_person)
+    data object SearchUser: Screen("SearchUsers", icon = R.drawable.search_person, screenLabel = "Search")
 
-    data object FriendRequest: Screen("FriendRequest", icon = R.drawable.group)
+    data object FriendRequest: Screen("FriendRequest", icon = R.drawable.group, screenLabel = "friends requests")
 
     data object FriendProfile: Screen(
         route = "FriendProfileScreen/{userUid}",
@@ -41,9 +46,9 @@ sealed class Screen(val route: String, val navArguments: List<NamedNavArgument> 
         fun createRoute(chatRoomUID: String) = "SingleChatRoom/${chatRoomUID}"
     }
 
-    data object Friends: Screen("Friends", icon = R.drawable.group)
+    data object Friends: Screen("Friends", icon = R.drawable.group, screenLabel = "Friends")
 
-    data object Messages: Screen("Messages", icon = R.drawable.chat)
+    data object Messages: Screen("Messages", icon = R.drawable.chat, screenLabel = "Chat")
 
 }
 

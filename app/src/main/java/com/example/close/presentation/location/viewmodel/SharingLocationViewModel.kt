@@ -13,9 +13,9 @@ import com.example.close.CloseApp
 import com.example.close.data.database.CloseUserDataSource
 import com.example.close.data.location.LocationDataSource
 import com.example.close.data.location.model.FriendLocationDetail
+import com.example.close.data.location.model.LocationModel
 import com.example.close.presentation.location.models.FriendLocation
 import com.example.close.presentation.location.models.SharingState
-import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -35,7 +35,7 @@ class SharingLocationViewModel(
      * @param friendsLIst: friends uid list
      * @param locationDetail: location latitude and longitude
      */
-    fun shareLocationToFriends(userUID: String,  friendsLIst: List<String>,locationDetail: LatLng){
+    fun shareLocationToFriends(userUID: String,  friendsLIst: List<String>,locationDetail: LocationModel){
 
         viewModelScope.launch(Dispatchers.IO){
             val userLocationDetail = FriendLocationDetail(
