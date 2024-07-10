@@ -1,5 +1,7 @@
 package com.example.close.presentation.navigation
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -34,17 +36,19 @@ import com.example.close.presentation.friends.screens.FriendRequestsScreen
 import com.example.close.presentation.friends.screens.FriendsScreen
 import com.example.close.presentation.friends.screens.SearchUser
 import com.example.close.presentation.friends.viewmodels.FriendRequestsViewModel
+import com.example.close.presentation.friends.viewmodels.SearchUserViewModel
 import com.example.close.presentation.location.screens.CurrentLocation
 import com.example.close.presentation.location.viewmodel.LocationViewModel
+import com.example.close.presentation.location.viewmodel.SharingLocationViewModel
 import com.example.close.presentation.messaging.screens.MessageScreen
 import com.example.close.presentation.messaging.screens.SingleChatRoom
 import com.example.close.presentation.messaging.viewmodel.MessagingViewModel
 import com.example.close.presentation.profile.screens.EditProfileScreen
 import com.example.close.presentation.profile.screens.ProfileScreen
 import com.example.close.presentation.profile.viewmodels.CurrentUserProfileDetailsViewModel
-import com.example.close.presentation.profile.viewmodels.SearchUserViewModel
 import com.google.firebase.auth.FirebaseAuth
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun NavigationHost(
     auth: FirebaseAuth
@@ -66,6 +70,9 @@ fun NavigationHost(
     val locationViewModel: LocationViewModel= viewModel(factory = LocationViewModel.factory)
     val currentLocation = locationViewModel.location.collectAsState().value
     val locationDetails= locationViewModel.locationState
+
+    //sharing location viewmodel
+    val sharingViewModel: SharingLocationViewModel = viewModel(factory = SharingLocationViewModel.Factory)
 
     //search user viewmodel
     val searchUserViewModel: SearchUserViewModel = viewModel(factory = SearchUserViewModel.Factory)
@@ -179,7 +186,11 @@ fun NavigationHost(
             }
 
             composable(Screen.Location.route){
-                CurrentLocation(locationState = locationDetails)
+                CurrentLocation(
+                    locationViewModel = locationViewModel,
+                    friendsList = currentUser.friends,
+                    currentUserUID = currentUser.uid
+                )
             }
 
             composable(
@@ -209,7 +220,7 @@ fun NavigationHost(
                     currentUserUid = currentUser.uid,
                     messagingViewModel = messagingViewModel,
                     goToChatRoom = {roomUid ->
-                        navController.navigate(Screen.SingleChatRoom.createRoute(roomUid))
+                        navController.navigate(Screen.SingleChatRoom.createRoute(roomUid!!))
                     }
                 )
             }

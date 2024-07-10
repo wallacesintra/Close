@@ -1,11 +1,15 @@
 package com.example.close.presentation.messaging.viewmodel
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
+import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
@@ -15,32 +19,168 @@ import com.example.close.data.database.models.CloseUser
 import com.example.close.data.messaging.CloseMessagingDataSource
 import com.example.close.presentation.messaging.models.ChatRoomsState
 import com.example.close.presentation.messaging.models.CloseChatRoomUI
-import com.example.close.presentation.messaging.models.MessageState
+import com.example.close.presentation.messaging.models.MessageListUI
+import com.example.close.presentation.messaging.models.MessageType
 import com.example.close.presentation.messaging.models.MessageUI
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class MessagingViewModel(
+    private val savedStateHandle: SavedStateHandle,
     private val closeMessagingDataSource: CloseMessagingDataSource,
     private val closeUserDataSource: CloseUserDataSource
 ): ViewModel() {
 
-//    var chatRoomsState: ChatRoomsState by mutableStateOf(ChatRoomsState.Loading)
-var chatRoomsState: ChatRoomsState by mutableStateOf(ChatRoomsState.Success(chatRoomList = emptyList()))
+    private val _messageText = MutableStateFlow("")
+    val messageText = _messageText.asStateFlow()
 
-    //    var messageState: MessageState by mutableStateOf(MessageState.Loading)
-    var messageState: MessageState by mutableStateOf(MessageState.Success(messagesList = emptyList()))
 
+    private val _showMessages  = MutableStateFlow(MessageType.ALL)
+
+    fun setChatRoomUID(chatRoomUID: String){
+        savedStateHandle["chatRoomUID"] = chatRoomUID
+    }
+
+    private val _messageFlow = MutableStateFlow<List<MessageUI>>(emptyList())
+    val messageFlow: StateFlow<List<MessageUI>> = _messageFlow.asStateFlow()
+
+    private val chatRoomUID = savedStateHandle.getStateFlow("chatRoomUID","")
+
+    fun listenToChatRoomMessages(chatRoomUID: String){
+        viewModelScope.launch {
+
+            closeMessagingDataSource.getChatRoomMessages(chatRoomUID).collect { messages  ->
+
+                val messageList = mutableListOf<MessageUI>()
+
+                for (i in messages){
+                    val sender = closeUserDataSource.getCloseUserByUid(i.senderUid)
+
+                    messageList.add(
+                        MessageUI(
+                            messageUid = i.messageUid,
+                            sender = sender,
+                            message = i.message
+                        )
+                    )
+                }
+
+                _messageFlow.value = messageList
+            }
+        }
+    }
+
+    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
+    val flowing = messageText
+        .debounce(50L)
+        .flatMapLatest {
+            flow {
+                val messageList = mutableListOf<MessageUI>()
+
+                closeMessagingDataSource.getChatRoomMessages(chatRoomUID.value).collect { messages  ->
+                    for (i in messages){
+                        val sender = closeUserDataSource.getCloseUserByUid(i.senderUid)
+
+                        messageList.add(
+                            MessageUI(
+                                messageUid = i.messageUid,
+                                sender = sender,
+                                message = i.message
+                            )
+                        )
+                    }
+
+                    _messageFlow.value = messageList
+                }
+                emit(messageList)
+            }
+        }
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(),
+            _messageFlow.value
+        )
+
+//    init {
+//        viewModelScope.launch {
+//            delay(10000)
+//
+//            listenToChatRoomMessages(chatRoomUID = chatRoomUID.value)
+//        }
+//    }
+
+
+
+
+
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val _showMessageList = _showMessages
+        .flatMapLatest { show ->
+            chatRoomUID.let { uid ->
+                when(show){
+                    MessageType.ALL -> closeMessagingDataSource.getChatRoomMessages(chatRoomUid = uid.value)
+                    MessageType.UNREAD -> closeMessagingDataSource.getChatRoomMessages(chatRoomUid = uid.value)
+                }
+            }
+        }
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(),
+            emptyList()
+        )
+
+    private val _messageListState = MutableStateFlow(MessageListUI())
+
+    val showMessageList = combine(_messageListState, _showMessages, _showMessageList){ state, _, list ->
+        val messageList = mutableListOf<MessageUI>()
+
+        for (i in list){
+            val sender = closeUserDataSource.getCloseUserByUid(i.senderUid)
+            messageList.add(
+                MessageUI(
+                    message = i.message,
+                    sender = sender,
+                    messageUid = i.messageUid
+                )
+            )
+        }
+
+        state.copy(
+            messageList = messageList,
+        )
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), MessageListUI())
+
+
+
+    var chatRoomsState: ChatRoomsState by mutableStateOf(ChatRoomsState.Success(chatRoomList = emptyList()))
+
+    fun messageTextChange(text: String) {
+        _messageText.value = text
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
     fun sendMessage(roomUid: String, senderUid: String, textMessage:String){
         viewModelScope.launch(Dispatchers.IO) {
             closeMessagingDataSource.sendMessage(roomUid, senderUid, textMessage)
+            _messageText.value = ""
         }
     }
 
     fun getCurrentUserChatRooms(currentUserUid: String){
         viewModelScope.launch(Dispatchers.IO) {
             try {
-//                chatRoomsState = ChatRoomsState.Loading
 
                 val chatRoomList = closeMessagingDataSource.getChatRoomsForUid(userUid = currentUserUid)
                 val closeChatRoomLIstUI = mutableListOf<CloseChatRoomUI>()
@@ -74,37 +214,6 @@ var chatRoomsState: ChatRoomsState by mutableStateOf(ChatRoomsState.Success(chat
         }
     }
 
-    fun getChatRoomByChatUid(chatRoom: String){
-        viewModelScope.launch {
-            try {
-//                messageState = MessageState.Loading
-                val currentChatRoom = closeMessagingDataSource.getChatRoomByChatRoomUid(chatroomUid = chatRoom)
-
-                val messagesList = mutableListOf<MessageUI>()
-
-                for (message in currentChatRoom.messages){
-                    val sender = closeUserDataSource.getCloseUserByUid(message.senderUid)
-
-                    messagesList.add(
-                        MessageUI(
-                            messageUid = message.messageUid,
-                            sender = sender,
-                            message = message.message,
-                        )
-                    )
-                }
-
-                messageState = try {
-                    MessageState.Success(messagesList = messagesList.reversed())
-                }catch (e: Exception){
-                    MessageState.Error(e.message!!)
-                }
-            }catch (e: Exception){
-                messageState = MessageState.Error(error = e.message!!)
-            }
-        }
-    }
-
 
     companion object {
         val Factory: ViewModelProvider.Factory = viewModelFactory {
@@ -113,9 +222,13 @@ var chatRoomsState: ChatRoomsState by mutableStateOf(ChatRoomsState.Success(chat
                 val closeMessagingDataSource = application.container.closeMessagingDataSource
                 val closeUserDataSource = application.container.closeUserDataSource
 
-                MessagingViewModel(closeMessagingDataSource = closeMessagingDataSource, closeUserDataSource = closeUserDataSource)
+                val savedStateHandle = createSavedStateHandle()
+
+                MessagingViewModel(savedStateHandle = savedStateHandle,closeMessagingDataSource = closeMessagingDataSource, closeUserDataSource = closeUserDataSource)
             }
         }
     }
+
+
 
 }

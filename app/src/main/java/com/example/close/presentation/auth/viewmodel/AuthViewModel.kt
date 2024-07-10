@@ -14,6 +14,7 @@ import com.example.close.data.auth.Resource
 import com.example.close.data.auth.UserDataSource
 import com.example.close.data.cometChat.CometChatAuthImp
 import com.example.close.data.database.CloseUserDataSource
+import com.example.close.data.location.LocationDataSource
 import com.example.close.presentation.auth.models.AuthState
 import com.example.close.presentation.models.CloseUserData
 import kotlinx.coroutines.Dispatchers
@@ -22,7 +23,8 @@ import kotlinx.coroutines.launch
 class AuthViewModel(
     private val userDataSource: UserDataSource,
     private val closeUserDataSource: CloseUserDataSource,
-    private val cometChatAuthImp: CometChatAuthImp
+    private val cometChatAuthImp: CometChatAuthImp,
+    private val locationDataSource: LocationDataSource
 ): ViewModel() {
 
     var authState: AuthState by mutableStateOf(AuthState())
@@ -82,6 +84,9 @@ class AuthViewModel(
 
                     //create comet chat user
                     cometChatAuthImp.createCometUser(userId = user.uid, username = user.username)
+
+                    //create a locations container
+                    locationDataSource.createLocationContainer(userUID = user.uid)
 
 
                     userData = userData.copy(
@@ -157,11 +162,13 @@ class AuthViewModel(
                 val userDataSource = application.container.userDataSource
                 val closeUserDataSource = application.container.closeUserDataSource
                 val cometChatAuthImp = application.container.cometChatAuthImp
+                val locationDataSource = application.container.locationDataSource
 
                 AuthViewModel(
                     userDataSource = userDataSource,
                     closeUserDataSource = closeUserDataSource,
-                    cometChatAuthImp = cometChatAuthImp
+                    cometChatAuthImp = cometChatAuthImp,
+                    locationDataSource = locationDataSource
                 )
             }
         }

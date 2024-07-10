@@ -50,7 +50,8 @@ class DefaultContainer(
         LocationDataSource(
             context = applicationContext,
             fusedLocationProviderClient = fusedLocationClient,
-            currentLocationRequest = LocationRequest.create()
+            currentLocationRequest = LocationRequest.create(),
+            firestoreDB = firestoreDb
         )
     }
     override val cometChatAuthImp: CometChatAuthImp by lazy {

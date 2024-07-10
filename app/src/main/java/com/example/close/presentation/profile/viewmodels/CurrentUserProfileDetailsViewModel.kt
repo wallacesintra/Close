@@ -40,14 +40,14 @@ class CurrentUserProfileDetailsViewModel(
             try {
                 detailsState = DetailsState.Loading
 
-                val deferreds = friendsList.map { uid ->
+                val deferred = friendsList.map { uid ->
                     async {
                         Log.d("get friends", "successful $uid")
                         closeUserDataSource.getCloseUserByUid(closeUid = uid)
                     }
                 }
 
-                val currentUserFriendsList = deferreds.awaitAll()
+                val currentUserFriendsList = deferred.awaitAll()
 
                 detailsState = DetailsState.Success(friendsList = currentUserFriendsList)
             }catch (e: Exception){

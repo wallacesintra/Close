@@ -25,7 +25,7 @@ import com.example.close.R
 import com.example.close.presentation.components.Loading
 import com.example.close.presentation.components.MediumFriendProfileContainer
 import com.example.close.presentation.components.MediumText
-import com.example.close.presentation.profile.viewmodels.SearchUserViewModel
+import com.example.close.presentation.friends.viewmodels.SearchUserViewModel
 
 @Composable
 fun SearchUser(
