@@ -103,66 +103,13 @@ class CloseMessagingDataSource(
                         }
                     }
 
-                // Optionally, if you want to remove the listener after resuming to prevent memory leaks
+              //remove the listener after resuming to prevent memory leaks
                 continuation.invokeOnCancellation {
                     listenerRegistration.remove()
                 }
             }
         }
 
-//    override suspend fun getChatRoomMessages(chatRoomUID: String): List<CloseMessage> = withContext(Dispatchers.IO) {
-//        suspendCancellableCoroutine { continuation ->
-//            var hasResumed = false
-//
-//            val listenerRegistration = firestoreDb.collection(closeChatsCollection).document(chatRoomUID)
-//                .addSnapshotListener { value, error ->
-//                    if (error != null) {
-//                        if (!hasResumed) {
-//                            continuation.resumeWithException(error)
-//                            hasResumed = true
-//                        }
-//                        return@addSnapshotListener
-//                    }
-//
-//                    val chatRoom = value?.toObject<CloseChatRoom>()
-//
-//                    if(chatRoom != null){
-//                        continuation.resume(chatRoom.messages)
-//                    }else{
-////                      continuation.resumeWithException(KotlinNullPointerException("ChatRoom is null"))
-//                        continuation.resume(emptyList())
-//                    }
-//                }
-//
-//            continuation.invokeOnCancellation {
-//                listenerRegistration.remove()
-//            }
-//        }
-//    }
-
-//    override suspend fun getChatRoomMessages(chatRoomUid: String): Flow<List<CloseMessage>> = flow {
-//        val hasResumed = AtomicBoolean(false)
-//        val registration = firestoreDb.collection(closeChatsCollection).document(chatRoomUid)
-//            .addSnapshotListener { snapshot, error ->
-//                if (error != null) {
-//                    if (hasResumed.compareAndSet(false, true)) {
-//                        throw error
-//                    }
-//                } else {
-//                    snapshot?.let {
-//                        val messages = it.toObject<CloseChatRoom>() // Assuming CloseMessage can be directly converted
-//                        if (messages != null && hasResumed.compareAndSet(false, true)) {
-//                            emit(messages.messages)
-////                            registration.remove() // Stop listening to further updates
-//                        }
-//                    }
-//                }
-//            }
-//        awaitClose { registration.remove() } // Ensure listener is removed if flow collection is stopped
-//    }.flowOn(Dispatchers.IO) // Run in IO dispatcher for database operations
-
-
-    //this
     override suspend fun getChatRoomMessages(chatRoomUid: String): Flow<List<CloseMessage>> =
 
         callbackFlow {
@@ -188,114 +135,6 @@ class CloseMessagingDataSource(
                 registration.remove()
             }
         }
-
-//    override suspend fun getChatRoomByChatRoomUid(chatroomUid: String): CloseChatRoom  = withContext(Dispatchers.IO){
-//        suspendCancellableCoroutine { continuation ->
-//            firestoreDb.collection(closeChatsCollection).document(chatroomUid)
-//                .get()
-//                .addOnSuccessListener { room ->
-//                    val chatRoom = room.toObject<CloseChatRoom>()
-//
-//                    continuation.resume(
-//                        CloseChatRoom(
-//                            chatUid = chatRoom!!.chatUid,
-//                            members = chatRoom.members,
-//                            messages = chatRoom.messages,
-//                        )
-//                    )
-//                }
-//                .addOnFailureListener { e ->
-//                    Log.w("CloseChat: Get Room details", "details fetched successful")
-//                    continuation.resumeWithException(e)
-//                }
-//        }
-//    }
-
-//    override suspend fun getChatRoomByChatRoomUid(chatroomUid: String): Flow<CloseChatRoom> = withContext(Dispatchers.IO) {
-//        flow {
-//            val registration = firestoreDb.collection(closeChatsCollection).document(chatroomUid)
-//                .addSnapshotListener { value, error ->
-//                    if (error != null) {
-//                        throw error
-//                    } else {
-//                        val chatRoom = value?.toObject<CloseChatRoom>()
-//                        if (chatRoom != null) {
-//                            emit(chatRoom)
-//                        } else {
-//                            throw KotlinNullPointerException("ChatRoom is null")
-//                        }
-//                    }
-//                }
-//
-//            awaitClose {
-//                registration.remove()
-//            }
-//        }
-//    }
-
-
-//    override suspend fun getChatRoomByChatRoomUid(chatroomUid: String): CloseChatRoom = withContext(Dispatchers.IO) {
-//        suspendCancellableCoroutine { continuation ->
-//            var hasResumed = false // Flag to track if the continuation has been resumed
-//
-//            // Registering the snapshot listener
-//            val registration = firestoreDb.collection(closeChatsCollection).document(chatroomUid)
-//                .addSnapshotListener { value, error ->
-//                    if (!hasResumed) { // Check if the continuation has not been resumed yet
-//                        if (error != null) {
-//                            continuation.resumeWithException(error)
-//                        } else {
-//                            val chatRoom = value?.toObject<CloseChatRoom>()
-//                            if (chatRoom != null) {
-//                                continuation.resume(chatRoom)
-//                            } else {
-//                                continuation.resumeWithException(KotlinNullPointerException("ChatRoom is null"))
-//                            }
-//                        }
-//                        hasResumed = true // Mark the continuation as resumed
-////                        registration.remove() // Remove the listener to prevent further updates
-//                    }
-//                }
-//
-//            // Optionally, remove the listener when the coroutine is cancelled
-//            continuation.invokeOnCancellation {
-//                registration.remove()
-//            }
-//        }
-//    }
-
-//    override suspend fun getChatRoomsForUid(userUid: String): List<CloseChatRoom> = withContext(Dispatchers.IO){
-//        suspendCancellableCoroutine { continuation ->
-//            firestoreDb.collection(closeChatsCollection)
-//                .whereArrayContains("members", userUid)
-//                .addSnapshotListener { value, error ->
-//                    if (error != null){
-//                        if (continuation.isActive){
-//                            continuation.resumeWithException(error)
-//                        }
-//                        Log.w("CloseChat: message listener", "listen failed, $error")
-//                        continuation.resume(emptyList())
-//                    }
-//
-//                    val chatRoomList = mutableListOf<CloseChatRoom>()
-//
-//                    for (doc in value!!){
-//                        val chatRoom = doc.toObject<CloseChatRoom>()
-//
-//                        chatRoomList.add(
-//                            CloseChatRoom(
-//                                chatUid = chatRoom.chatUid,
-//                                members = chatRoom.members,
-//                                messages = chatRoom.messages
-//                            )
-//                        )
-//                    }
-//                    Log.d("CloseChat: message listener", " listen successful")
-//                    continuation.resume(chatRoomList)
-//                }
-//        }
-//    }
-
 
 
 }
