@@ -4,7 +4,7 @@ sealed interface LocationState {
 
     data class Success(val locationDetails: LocationDetails): LocationState
 
-    data object Error: LocationState
+    data class Error(val error: String) : LocationState
 
     data object Loading: LocationState
 

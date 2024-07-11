@@ -80,6 +80,7 @@ dependencies {
 
     // Declare the dependency for the Cloud Firestore library
     implementation("com.google.firebase:firebase-firestore")
+    implementation("androidx.media3:media3-common:1.3.1")
 
     //
     val nav_version = "2.7.7"

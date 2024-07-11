@@ -115,7 +115,13 @@ class CloseUserDataSource(
     }
 
     override suspend fun getCloseUserByUid(closeUid: String): CloseUser {
+
+
         val deferred = CompletableDeferred<CloseUser>()
+        if (closeUid == "") {
+            return CloseUser()
+        }
+
 
         firestoreDb.collection("closeUsers").document(closeUid)
             .get()

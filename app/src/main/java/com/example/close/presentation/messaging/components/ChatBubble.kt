@@ -35,10 +35,8 @@ fun ChatBubble(
         ) {
             Text(
                 text = messageUI.sender.username,
-//                color = MaterialTheme.colorScheme.primaryContainer
                 color = if (messageUI.sender.uid == currentUserUid) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.primary
             )
-
             Text(text = messageUI.message, color = if (messageUI.sender.uid == currentUserUid) MaterialTheme.colorScheme.background else MaterialTheme.colorScheme.onBackground)
         }
     }

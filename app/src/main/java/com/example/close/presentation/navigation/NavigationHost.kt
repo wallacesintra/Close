@@ -1,6 +1,9 @@
 package com.example.close.presentation.navigation
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -14,9 +17,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -34,17 +39,19 @@ import com.example.close.presentation.friends.screens.FriendRequestsScreen
 import com.example.close.presentation.friends.screens.FriendsScreen
 import com.example.close.presentation.friends.screens.SearchUser
 import com.example.close.presentation.friends.viewmodels.FriendRequestsViewModel
+import com.example.close.presentation.friends.viewmodels.SearchUserViewModel
 import com.example.close.presentation.location.screens.CurrentLocation
 import com.example.close.presentation.location.viewmodel.LocationViewModel
+import com.example.close.presentation.location.viewmodel.SharingLocationViewModel
 import com.example.close.presentation.messaging.screens.MessageScreen
 import com.example.close.presentation.messaging.screens.SingleChatRoom
 import com.example.close.presentation.messaging.viewmodel.MessagingViewModel
 import com.example.close.presentation.profile.screens.EditProfileScreen
 import com.example.close.presentation.profile.screens.ProfileScreen
 import com.example.close.presentation.profile.viewmodels.CurrentUserProfileDetailsViewModel
-import com.example.close.presentation.profile.viewmodels.SearchUserViewModel
 import com.google.firebase.auth.FirebaseAuth
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun NavigationHost(
     auth: FirebaseAuth
@@ -66,6 +73,9 @@ fun NavigationHost(
     val locationViewModel: LocationViewModel= viewModel(factory = LocationViewModel.factory)
     val currentLocation = locationViewModel.location.collectAsState().value
     val locationDetails= locationViewModel.locationState
+
+    //sharing location viewmodel
+    val sharingViewModel: SharingLocationViewModel = viewModel(factory = SharingLocationViewModel.Factory)
 
     //search user viewmodel
     val searchUserViewModel: SearchUserViewModel = viewModel(factory = SearchUserViewModel.Factory)
@@ -92,24 +102,41 @@ fun NavigationHost(
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Screens.forEach {screen ->
-                            IconButton(
-                                colors = IconButtonColors(
-                                    containerColor = if (currentDestination?.hierarchy?.any { it.route ==  screen.route} == true)
-                                        MaterialTheme.colorScheme.primary else Color.Transparent,
-                                    contentColor = if (currentDestination?.hierarchy?.any { it.route ==  screen.route} == true)
-                                        MaterialTheme.colorScheme.background else MaterialTheme.colorScheme.primary,
-                                    disabledContainerColor = Color.Transparent,
-                                    disabledContentColor = MaterialTheme.colorScheme.primary
-                                ),
-                                onClick = {
-                                    navController.navigate(screen.route){
-                                        popUpTo(navController.graph.findStartDestination().id){
-                                            saveState = true
+                            Column(
+                                verticalArrangement = Arrangement.Center,
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                modifier = Modifier.padding(4.dp)
+                            ) {
+                                IconButton(
+                                    colors = IconButtonColors(
+                                        containerColor = if (currentDestination?.hierarchy?.any { it.route == screen.route } == true)
+                                            MaterialTheme.colorScheme.primary else Color.Transparent,
+                                        contentColor = if (currentDestination?.hierarchy?.any { it.route == screen.route } == true)
+                                            MaterialTheme.colorScheme.background else MaterialTheme.colorScheme.primary,
+                                        disabledContainerColor = Color.Transparent,
+                                        disabledContentColor = MaterialTheme.colorScheme.primary
+                                    ),
+                                    onClick = {
+                                        navController.navigate(screen.route) {
+                                            popUpTo(navController.graph.findStartDestination().id) {
+                                                saveState = true
+                                            }
+                                            launchSingleTop = true
+                                            restoreState = true
                                         }
-                                        launchSingleTop = true
-                                        restoreState = true
-                                    }}) {
-                                Icon(painter = painterResource(id = screen.icon!!), contentDescription = "navigate to ${screen.route}")
+                                    }) {
+                                    Icon(
+                                        painter = painterResource(id = screen.icon!!),
+                                        contentDescription = "navigate to ${screen.route}"
+                                    )
+                                }
+
+//                                Text(
+//                                    text = screen.screenLabel!!,
+//                                    fontSize = 15.sp,
+//                                    color = MaterialTheme.colorScheme.primary
+//                                )
+
                             }
                         }
                     }
@@ -179,7 +206,12 @@ fun NavigationHost(
             }
 
             composable(Screen.Location.route){
-                CurrentLocation(locationState = locationDetails)
+                CurrentLocation(
+                    locationViewModel = locationViewModel,
+                    friendsList = currentUser.friends,
+                    currentUserUID = currentUser.uid
+                )
+
             }
 
             composable(

@@ -1,43 +1,75 @@
 package com.example.close.presentation.location.screens
 
+import android.util.Log
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.runtime.LaunchedEffect
+import com.example.close.data.location.model.LocationModel
 import com.example.close.presentation.components.Loading
 import com.example.close.presentation.location.components.MapView
 import com.example.close.presentation.location.models.LocationState
-import com.google.android.gms.maps.model.LatLng
+import com.example.close.presentation.location.viewmodel.LocationViewModel
 
 
 @Composable
 fun CurrentLocation(
-    locationState: LocationState
+    currentUserUID: String,
+    friendsList: List<String>,
+    locationViewModel: LocationViewModel
 ){
+    val locationState = locationViewModel.locationState
 
-    val context = LocalContext.current
+    val sharingState = locationViewModel.sharingState
+
+    LaunchedEffect(key1 = Unit) {
+        locationViewModel.getCurrentLocation()
+        Log.w("user uid compose",currentUserUID)
+        locationViewModel.receiveLocationsFromFriends(userUID = currentUserUID)
+    }
 
 
 
     when(locationState){
-        LocationState.Error -> Text(text = "error......")
+        is LocationState.Error -> Text(text = "error: ")
         LocationState.Loading -> { Loading() }
 
         is LocationState.Success -> {
             val location = locationState.locationDetails
-            
+
+//            val currentLocation = LatLng(location.lat, location.long)
+            val currentLocation = LocationModel(
+                latitude = locationState.locationDetails.lat,
+                longitude = locationState.locationDetails.long
+            )
+
+
+//            locationViewModel.shareLocationToFriends(userUID = currentUserUID , friendsLIst = friendsList, locationDetail = currentLocation)
+
+            locationViewModel.shareLocationToFriends(
+                userUID = currentUserUID,
+                friendsLIst = friendsList,
+//                friendsLIst = emptyList(),
+                locationDetail = currentLocation
+            )
+
             MapView(
                 locationDetails = location,
-                friendLocation = listOf(
-                    LatLng(-0.710000, 36.294319),
-                    LatLng(-1.292066, 36.821945),
-                    LatLng(-0.091702, 34.767956),
-                    LatLng(-1.194400, 36.944630),
-                    LatLng(-1.265040, 36.804550),
-                    LatLng(-1.225080, 36.877820)
-                )
+                sharingState = sharingState
+//                friendLocation = sharingState.friendsLocationList
+
+//                when(sharingState){
+//                    is SharingState.Error -> { Text(text = "error : " + sharingState.error)}
+//                    SharingState.Loading -> { Loading() }
+//                    is SharingState.Success -> {
+//                    }
+//                }
             )
-            
+
+
+
+
         }
+
     }
 
 
