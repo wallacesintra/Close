@@ -19,7 +19,7 @@ import com.example.close.R
 @Composable
 fun ProfileImg(
     modifier: Modifier = Modifier,
-    imageResId: Int = R.drawable.female_dp,
+    imageResId: Int,
     imgSize:  Dp
 ){
     Image(

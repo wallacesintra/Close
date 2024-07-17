@@ -4,8 +4,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import com.example.close.presentation.models.CloseUserData
-import com.google.firebase.auth.FirebaseUser
+import com.example.close.data.database.models.CloseUserData
 
 @Composable
 fun Profile(

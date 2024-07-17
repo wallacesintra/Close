@@ -73,7 +73,10 @@ fun SingleChatRoom(
 //                items(showMessageList.messageList) { message ->
 //                    ChatBubble(currentUserUid = chatRoomUid, messageUI = message)
 //                }
-                items(showMessageList.messageList){ message ->
+                items(
+                    items = showMessageList.messageList,
+                    key = { message -> message.messageUid }
+                ){ message ->
                     ChatBubble(currentUserUid = currentUserUid, messageUI = message)
                 }
 

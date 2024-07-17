@@ -1,4 +1,4 @@
-package com.example.close.presentation.components
+package com.example.close.presentation.profile.components
 
 
 import androidx.compose.foundation.clickable

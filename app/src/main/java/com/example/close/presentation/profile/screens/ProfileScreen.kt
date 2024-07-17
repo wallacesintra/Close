@@ -13,11 +13,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.close.R
+import com.example.close.data.database.models.CloseUserData
 import com.example.close.presentation.components.LargeActionContainer
 import com.example.close.presentation.components.LargeText
 import com.example.close.presentation.components.MediumText
 import com.example.close.presentation.components.ProfileImg
-import com.example.close.presentation.models.CloseUserData
+import com.example.close.presentation.models.profileImagesMap
 
 @Composable
 fun ProfileScreen(
@@ -32,7 +33,13 @@ fun ProfileScreen(
         modifier = Modifier
             .fillMaxSize()
     ) {
-        ProfileImg(imgSize = 120.dp, modifier = Modifier.padding(10.dp))
+        profileImagesMap[userData.profileImg]?.let {
+            ProfileImg(
+                imgSize = 120.dp,
+                imageResId = it.imgResId,
+                modifier = Modifier.padding(10.dp)
+            )
+        }
 
         LargeText(text = userData.username, isBold = true, fontSize = 30.sp, modifier = Modifier.padding(bottom = 10.dp))
 

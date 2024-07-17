@@ -2,8 +2,8 @@ package com.example.close.data.database
 
 import android.util.Log
 import com.example.close.data.database.models.CloseUser
+import com.example.close.data.database.models.CloseUserData
 import com.example.close.data.database.models.FriendRequest
-import com.example.close.presentation.models.CloseUserData
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.toObject
@@ -101,6 +101,7 @@ class CloseUserDataSource(
                             uid = user.uid,
                             username = user.username,
                             bio = user.bio,
+                            profileImg = user.profileImg,
                             sharingLocation = user.shareLocation
                         ))
                         Log.d("firestore: find by username", "users found" + i.data)

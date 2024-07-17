@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import com.example.close.presentation.components.MediumText
 import com.example.close.presentation.components.ProfileImg
 import com.example.close.presentation.messaging.models.CloseChatRoomUI
+import com.example.close.presentation.models.profileImagesMap
 
 
 @Composable
@@ -39,10 +40,16 @@ fun ChatRoomContainer(
                 modifier = Modifier.size(55.dp)
             ) {
                 Row {
-                    ProfileImg(imgSize = 40.dp)
+                    ProfileImg(
+                        imageResId = profileImagesMap[closeChatRoomUi.members[0].profileImg]!!.imgResId,
+                        imgSize = 40.dp
+                    )
                 }
                 Box(modifier = Modifier.align(Alignment.BottomEnd)) {
-                    ProfileImg(imgSize = 40.dp)
+                    ProfileImg(
+                        imageResId = profileImagesMap[closeChatRoomUi.members[1].profileImg]!!.imgResId,
+                        imgSize = 40.dp
+                    )
                 }
             }
 

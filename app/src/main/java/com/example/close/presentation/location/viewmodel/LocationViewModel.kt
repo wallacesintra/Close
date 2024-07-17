@@ -46,9 +46,9 @@ class LocationViewModel(
 //
 //    private val currentUserUID = savedStateHandle.getStateFlow("currentUserUID", "")
 
-    init {
-        getCurrentLocation()
-    }
+//    init {
+//        getCurrentLocation()
+//    }
 
     fun createLocationContainer(userUID: String){
         viewModelScope.launch(Dispatchers.IO) {
@@ -102,6 +102,7 @@ class LocationViewModel(
      * @param locationDetail: location latitude and longitude
      */
     fun shareLocationToFriends(userUID: String,  friendsLIst: List<String>,locationDetail: LocationModel){
+
 
         viewModelScope.launch(Dispatchers.IO){
             val userLocationDetail = FriendLocationDetail(

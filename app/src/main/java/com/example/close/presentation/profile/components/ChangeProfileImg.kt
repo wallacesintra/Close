@@ -20,16 +20,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.close.R
 import com.example.close.presentation.components.ProfileImg
 
-@Preview(showBackground = true, showSystemUi = true)
+//@Preview(showBackground = true, showSystemUi = true)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChangeProfileImg(
-    currentProfileImgRes: Int = R.drawable.male_black1
+    currentProfileImgRes: Int = R.drawable.male_black1,
+    changeProfileImgEvent: (String) -> Unit
 ){
 
     val sheetState = rememberModalBottomSheetState()
@@ -76,7 +76,7 @@ fun ChangeProfileImg(
                     .fillMaxWidth()
                     .fillMaxHeight(0.5f)
             ) {
-                ProfileImgOptions()
+                ProfileImgOptions(changeProfileImgEvent)
             }
         }
 

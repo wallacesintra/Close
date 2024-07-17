@@ -6,7 +6,5 @@ data class FriendRequest(
     val requestUid: String = "",
     val receiverUid: String = "",
     val senderUid: String = "",
-//    val timeStamp: FieldValue,
-//    val timeStamp: Long? = null,
     var accepted: Boolean? = null
 )

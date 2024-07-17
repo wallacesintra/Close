@@ -14,9 +14,9 @@ import com.example.close.data.auth.Resource
 import com.example.close.data.auth.UserDataSource
 import com.example.close.data.cometChat.CometChatAuthImp
 import com.example.close.data.database.CloseUserDataSource
+import com.example.close.data.database.models.CloseUserData
 import com.example.close.data.location.LocationDataSource
 import com.example.close.presentation.auth.models.AuthState
-import com.example.close.presentation.models.CloseUserData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -51,6 +51,7 @@ class AuthViewModel(
                         email = currentUser.email,
                         username = currentUser.username,
                         bio = currentUser.bio,
+                        profileImg = currentUser.profileImg,
                         friends = currentUser.friends,
                         shareLocation = currentUser.shareLocation
                     )
