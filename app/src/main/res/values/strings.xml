@@ -50,5 +50,7 @@
     <string name="message">Message</string>
     <string name="messages">Messages</string>
     <string name="send_message">Send the message</string>
+    
+    <string name="say_hi">Say Hey</string>
 
 </resources>

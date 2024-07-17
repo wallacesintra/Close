@@ -14,12 +14,14 @@ fun MediumText(
     modifier: Modifier = Modifier,
     isBold: Boolean = false,
     centerText: Boolean = false,
-    fontSize: TextUnit = 16.sp
+    fontSize: TextUnit = 16.sp,
+    maxLines: Int = 1
 ){
     Text(
         text = text,
         textAlign = if (centerText) TextAlign.Center else TextAlign.Start,
         fontWeight = if (isBold) FontWeight.Bold else FontWeight.W300,
+        maxLines = maxLines,
         modifier = modifier,
         fontSize = fontSize
     )

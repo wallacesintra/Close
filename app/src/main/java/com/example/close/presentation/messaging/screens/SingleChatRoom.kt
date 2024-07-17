@@ -29,6 +29,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.close.R
 import com.example.close.presentation.components.LargeText
+import com.example.close.presentation.components.MediumText
 import com.example.close.presentation.messaging.components.ChatBubble
 import com.example.close.presentation.messaging.viewmodel.MessagingViewModel
 
@@ -64,25 +65,25 @@ fun SingleChatRoom(
                 modifier = Modifier.padding(vertical = 10.dp)
             )
 
-
+            
+            if (showMessageList.messageList.isEmpty()){
+                MediumText(
+                    text = stringResource(id = R.string.say_hi),
+                    modifier = Modifier
+                        .weight(1.0f)
+                )
+            }
             LazyColumn(
                 modifier = Modifier
                     .weight(1.0f)
                     .padding(bottom = 70.dp)
             ) {
-//                items(showMessageList.messageList) { message ->
-//                    ChatBubble(currentUserUid = chatRoomUid, messageUI = message)
-//                }
                 items(
                     items = showMessageList.messageList,
                     key = { message -> message.messageUid }
                 ){ message ->
                     ChatBubble(currentUserUid = currentUserUid, messageUI = message)
                 }
-
-//                items(flowing){ message ->
-//                    ChatBubble(currentUserUid = currentUserUid, messageUI = message)
-//                }
             }
             
         }
