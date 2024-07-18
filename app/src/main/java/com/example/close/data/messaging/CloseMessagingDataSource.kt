@@ -14,7 +14,6 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import java.util.UUID
-import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
@@ -111,30 +110,21 @@ class CloseMessagingDataSource(
         }
 
     override suspend fun getChatRoomMessages(chatRoomUid: String): Flow<List<CloseMessage>> =
-
         callbackFlow {
-            val hasResumed = AtomicBoolean(false)
-
-            val registration = firestoreDb.collection(closeChatsCollection).document(chatRoomUid)
-                .addSnapshotListener { snapshot, error ->
-                    if (error != null) {
-                        if (hasResumed.compareAndSet(false, true)) {
-                            close(error) // Close the flow with an error
-                        }
-                    } else {
-                        snapshot?.let {
-                            val messages = it.toObject<CloseChatRoom>()?.messages
-                            if (messages != null && hasResumed.compareAndSet(false, true)) {
-                                trySend(messages).isSuccess // Attempt to send the messages to the flow
-                            }
-                        }
+            val listener = firestoreDb.collection(closeChatsCollection)
+                .document(chatRoomUid)
+                .addSnapshotListener { snapshot, e ->
+                    if (e != null) {
+                        close() // Close the flow on error
+                        Log.w("CloseChats: receiving message", e.message!!)
+                        return@addSnapshotListener
                     }
+
+                    val textMessages = snapshot?.toObject<CloseChatRoom>()
+                    Log.d("CloseChats: receiving message", "messages received ${textMessages!!.messages.size}")
+
+                    trySend(textMessages.messages)
                 }
-
-            awaitClose {
-                registration.remove()
-            }
-        }
-
-
+        awaitClose { listener.remove() } // Detach the listener when the flow collector is done
+    }
 }

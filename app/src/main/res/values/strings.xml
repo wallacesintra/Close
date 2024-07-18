@@ -6,7 +6,7 @@
     
     <string name="sign_up">Sign Up</string>
     <string name="register">Register</string>
-    <string name="create_account">Create your new account</string>
+    <string name="create_account">Create an account</string>
     <string name="sign_up_username">Create your username</string>
     <string name="sign_up_password">Create password</string>
     <string name="sign_up_confirm_password">Confirm your password</string>
@@ -50,5 +50,7 @@
     <string name="message">Message</string>
     <string name="messages">Messages</string>
     <string name="send_message">Send the message</string>
+    
+    <string name="say_hi">Say Hey</string>
 
 </resources>

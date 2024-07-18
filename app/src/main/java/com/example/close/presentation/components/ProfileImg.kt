@@ -2,7 +2,6 @@ package com.example.close.presentation.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
@@ -20,10 +19,11 @@ import com.example.close.R
 @Composable
 fun ProfileImg(
     modifier: Modifier = Modifier,
+    imageResId: Int,
     imgSize:  Dp
 ){
     Image(
-        painter = painterResource(id = R.drawable.female_dp),
+        painter = painterResource(id = imageResId),
         contentDescription = stringResource(id = R.string.user_profile_img),
         contentScale = ContentScale.Crop,
         alignment = Alignment.Center,

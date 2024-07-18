@@ -40,16 +40,6 @@ class LocationViewModel(
     var sharingState: SharingState by mutableStateOf(SharingState.Success(friendsLocationList = emptyList()))
 
 
-//    fun getCurrentUserUID(userUID: String){
-//        savedStateHandle["currentUserUID"] = userUID
-//    }
-//
-//    private val currentUserUID = savedStateHandle.getStateFlow("currentUserUID", "")
-
-    init {
-        getCurrentLocation()
-    }
-
     fun createLocationContainer(userUID: String){
         viewModelScope.launch(Dispatchers.IO) {
             if(!locationDataSource.checkIfLocationContainerContainer(userUID = userUID)){
@@ -103,6 +93,7 @@ class LocationViewModel(
      */
     fun shareLocationToFriends(userUID: String,  friendsLIst: List<String>,locationDetail: LocationModel){
 
+
         viewModelScope.launch(Dispatchers.IO){
             val userLocationDetail = FriendLocationDetail(
                 userUID = userUID,
@@ -134,15 +125,25 @@ class LocationViewModel(
             try {
                 val friendsLocationList = mutableListOf<FriendLocation>()
                 val locationList = locationDataSource.getFriendsLocationNotFlow(userUID = userUID)
+
                 locationList.forEach { location ->
-                    closeUserDataSource.getCloseUserByUid(closeUid = location.userUID).let { user ->
-                        friendsLocationList.add(
-                            FriendLocation(
-                                closerUser = user,
-                                locationCoordinates = location.locationDetail
-                            )
+                    val user = closeUserDataSource.getCloseUserByUid(closeUid = location.userUID)
+
+                    Log.d("Getting Location detail", "location from $location")
+                    friendsLocationList.add(
+                        FriendLocation(
+                            closerUser = user,
+                            locationCoordinates = location.locationDetail
                         )
-                    }
+                    )
+//                    closeUserDataSource.getCloseUserByUid(closeUid = location.userUID).let { user ->
+//                        friendsLocationList.add(
+//                            FriendLocation(
+//                                closerUser = user,
+//                                locationCoordinates = location.locationDetail
+//                            )
+//                        )
+//                    }
                 }
                 Log.d("LocationSharing", "Successfully received ${friendsLocationList.size} locations")
                 sharingState = SharingState.Success(friendsLocationList = friendsLocationList)

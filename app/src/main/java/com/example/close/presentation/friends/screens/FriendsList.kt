@@ -22,6 +22,7 @@ import com.example.close.presentation.components.LargeText
 import com.example.close.presentation.components.Loading
 import com.example.close.presentation.components.MediumFriendProfileContainer
 import com.example.close.presentation.components.MediumText
+import com.example.close.presentation.models.profileImagesMap
 import com.example.close.presentation.profile.models.DetailsState
 import com.example.close.presentation.profile.viewmodels.CurrentUserProfileDetailsViewModel
 
@@ -39,7 +40,7 @@ fun FriendsList(
 
         LazyColumn {
             items(friendsList){friend ->
-                MediumFriendProfileContainer(userUid = friend.uid, username = friend.username)
+                MediumFriendProfileContainer(userUid = friend.uid, username = friend.username, imgResId = profileImagesMap[friend.profileImg]!!.imgResId)
             }
         }
     }

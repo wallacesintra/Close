@@ -20,6 +20,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -29,6 +31,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.close.R
 import com.example.close.presentation.components.LargeText
+import com.example.close.presentation.components.MediumText
 import com.example.close.presentation.messaging.components.ChatBubble
 import com.example.close.presentation.messaging.viewmodel.MessagingViewModel
 
@@ -42,14 +45,15 @@ fun SingleChatRoom(
     val messageText by messagingViewModel.messageText.collectAsState()
 
 
-    messagingViewModel.setChatRoomUID(chatRoomUID = chatRoomUid)
-    val messagesList by messagingViewModel.messageFlow.collectAsState()
-    val flowing by messagingViewModel.flowing.collectAsState()
+    LaunchedEffect(key1 = true) {
+        messagingViewModel.setChatRoomUID(chatRoomUID = chatRoomUid)
+    }
 
-//    LaunchedEffect(key1 = Unit) {
-//        messagingViewModel.listenToChatRoomMessages(chatRoomUid)
-//    }
-
+    DisposableEffect(true) {
+        onDispose {
+            messagingViewModel.resetChatRoomUID()
+        }
+    }
 
     val showMessageList by messagingViewModel.showMessageList.collectAsState()
 
@@ -57,6 +61,7 @@ fun SingleChatRoom(
         Column(
             modifier = Modifier
                 .padding(10.dp)
+                .fillMaxWidth()
         ) {
 
             LargeText(
@@ -64,22 +69,27 @@ fun SingleChatRoom(
                 modifier = Modifier.padding(vertical = 10.dp)
             )
 
-
+            
+            if (showMessageList.messageList.isEmpty()){
+                MediumText(
+                    text = stringResource(id = R.string.say_hi),
+                    modifier = Modifier
+                        .weight(1.0f)
+                        .align(Alignment.CenterHorizontally)
+                )
+            }
             LazyColumn(
+                reverseLayout = true,
                 modifier = Modifier
                     .weight(1.0f)
                     .padding(bottom = 70.dp)
             ) {
-//                items(showMessageList.messageList) { message ->
-//                    ChatBubble(currentUserUid = chatRoomUid, messageUI = message)
-//                }
-                items(showMessageList.messageList){ message ->
+                items(
+                    items = showMessageList.messageList,
+                    key = { message -> message.messageUid }
+                ){ message ->
                     ChatBubble(currentUserUid = currentUserUid, messageUI = message)
                 }
-
-//                items(flowing){ message ->
-//                    ChatBubble(currentUserUid = currentUserUid, messageUI = message)
-//                }
             }
             
         }

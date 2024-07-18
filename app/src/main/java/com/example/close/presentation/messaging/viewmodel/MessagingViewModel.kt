@@ -24,15 +24,11 @@ import com.example.close.presentation.messaging.models.MessageType
 import com.example.close.presentation.messaging.models.MessageUI
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -52,78 +48,11 @@ class MessagingViewModel(
         savedStateHandle["chatRoomUID"] = chatRoomUID
     }
 
-    private val _messageFlow = MutableStateFlow<List<MessageUI>>(emptyList())
-    val messageFlow: StateFlow<List<MessageUI>> = _messageFlow.asStateFlow()
-
-    private val chatRoomUID = savedStateHandle.getStateFlow("chatRoomUID","")
-
-    fun listenToChatRoomMessages(chatRoomUID: String){
-        viewModelScope.launch {
-
-            closeMessagingDataSource.getChatRoomMessages(chatRoomUID).collect { messages  ->
-
-                val messageList = mutableListOf<MessageUI>()
-
-                for (i in messages){
-                    val sender = closeUserDataSource.getCloseUserByUid(i.senderUid)
-
-                    messageList.add(
-                        MessageUI(
-                            messageUid = i.messageUid,
-                            sender = sender,
-                            message = i.message
-                        )
-                    )
-                }
-
-                _messageFlow.value = messageList
-            }
-        }
+    fun resetChatRoomUID(){
+        savedStateHandle["chatRoomUID"] = ""
     }
 
-    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
-    val flowing = messageText
-        .debounce(50L)
-        .flatMapLatest {
-            flow {
-                val messageList = mutableListOf<MessageUI>()
-
-                closeMessagingDataSource.getChatRoomMessages(chatRoomUID.value).collect { messages  ->
-                    for (i in messages){
-                        val sender = closeUserDataSource.getCloseUserByUid(i.senderUid)
-
-                        messageList.add(
-                            MessageUI(
-                                messageUid = i.messageUid,
-                                sender = sender,
-                                message = i.message
-                            )
-                        )
-                    }
-
-                    _messageFlow.value = messageList
-                }
-                emit(messageList)
-            }
-        }
-        .stateIn(
-            viewModelScope,
-            SharingStarted.WhileSubscribed(),
-            _messageFlow.value
-        )
-
-//    init {
-//        viewModelScope.launch {
-//            delay(10000)
-//
-//            listenToChatRoomMessages(chatRoomUID = chatRoomUID.value)
-//        }
-//    }
-
-
-
-
-
+    private val chatRoomUID = savedStateHandle.getStateFlow("chatRoomUID","")
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private val _showMessageList = _showMessages
@@ -146,7 +75,7 @@ class MessagingViewModel(
     val showMessageList = combine(_messageListState, _showMessages, _showMessageList){ state, _, list ->
         val messageList = mutableListOf<MessageUI>()
 
-        for (i in list){
+        for (i in list.reversed()){
             val sender = closeUserDataSource.getCloseUserByUid(i.senderUid)
             messageList.add(
                 MessageUI(

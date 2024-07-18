@@ -26,6 +26,7 @@ import com.example.close.presentation.components.Loading
 import com.example.close.presentation.components.MediumFriendProfileContainer
 import com.example.close.presentation.components.MediumText
 import com.example.close.presentation.friends.viewmodels.SearchUserViewModel
+import com.example.close.presentation.models.profileImagesMap
 
 @Composable
 fun SearchUser(
@@ -77,6 +78,7 @@ fun SearchUser(
                     MediumFriendProfileContainer(
                         userUid = user.uid,
                         username = user.username,
+                        imgResId = profileImagesMap[user.profileImg]!!.imgResId,
                         goToFriendProfile = goToFriendProfile
                     )
                 }

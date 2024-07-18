@@ -17,6 +17,7 @@ import com.example.close.presentation.components.MediumText
 import com.example.close.presentation.components.ProfileImg
 import com.example.close.presentation.friends.models.CloseUserState
 import com.example.close.presentation.friends.viewmodels.CloseUserViewModel
+import com.example.close.presentation.models.profileImagesMap
 
 
 //@Preview(showBackground = true, showSystemUi = true,)
@@ -46,7 +47,13 @@ fun FriendProfileScreen(
             is CloseUserState.Error -> { Text(text = closeUserState.error)}
             CloseUserState.Loading -> { Text(text = "loading......")}
             is CloseUserState.Success -> {
-                ProfileImg(imgSize = 120.dp, modifier = Modifier.padding(20.dp))
+                profileImagesMap[closeUserState.userDetails.profileImg]?.let {
+                    ProfileImg(
+                        imgSize = 120.dp,
+                        imageResId = it.imgResId,
+                        modifier = Modifier.padding(20.dp)
+                    )
+                }
                 LargeText(text = closeUserState.userDetails.username)
                 MediumText(text = closeUserState.userDetails.bio)
 

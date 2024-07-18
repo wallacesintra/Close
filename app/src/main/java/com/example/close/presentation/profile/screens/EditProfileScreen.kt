@@ -10,9 +10,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.close.R
-import com.example.close.presentation.components.EditDetail
-import com.example.close.presentation.components.ExtraLargeProfileImg
-import com.example.close.presentation.models.CloseUserData
+import com.example.close.data.database.models.CloseUserData
+import com.example.close.presentation.models.profileImagesMap
+import com.example.close.presentation.profile.components.ChangeProfileImg
+import com.example.close.presentation.profile.components.EditDetail
 import com.example.close.presentation.profile.viewmodels.CurrentUserProfileDetailsViewModel
 
 @Composable
@@ -29,9 +30,19 @@ fun EditProfileScreen(
             .fillMaxSize()
             .padding(vertical = 10.dp)
     ) {
-
-
-        ExtraLargeProfileImg()
+        //edit profile image
+        profileImagesMap[userData.profileImg]?.let {
+            ChangeProfileImg(
+                currentProfileImgRes = it.imgResId,
+                changeProfileImgEvent = { newProfile ->
+                    currentUserProfileDetailsViewModel.updateCurrentUserDetails(
+                        detailToUpdate = "profileImg",
+                        userUid = userData.uid,
+                        newValue = newProfile
+                    )
+                }
+            )
+        }
 
         //edit username
         EditDetail(

@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.dp
 fun MediumFriendProfileContainer(
     userUid: String,
     username: String,
+    imgResId: Int,
     goToFriendProfile: (String) -> Unit = {}
 ){
     Card(
@@ -34,7 +35,7 @@ fun MediumFriendProfileContainer(
             modifier = Modifier
                 .fillMaxWidth(0.99f)
         ) {
-            ProfileImg(imgSize = 60.dp, modifier = Modifier.padding(horizontal = 15.dp))
+            ProfileImg(imageResId =imgResId ,imgSize = 60.dp, modifier = Modifier.padding(horizontal = 15.dp))
 
             Column {
                 MediumText(text = username)

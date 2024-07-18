@@ -6,7 +6,3 @@ data class FriendsLocation(
 )
 
 
-data class FriendLocationDetail(
-    val userUID: String = "",
-    val locationDetail: LocationModel? = null
-)
