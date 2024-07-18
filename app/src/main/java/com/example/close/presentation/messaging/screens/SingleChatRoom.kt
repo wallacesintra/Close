@@ -20,6 +20,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -43,14 +45,15 @@ fun SingleChatRoom(
     val messageText by messagingViewModel.messageText.collectAsState()
 
 
-    messagingViewModel.setChatRoomUID(chatRoomUID = chatRoomUid)
-    val messagesList by messagingViewModel.messageFlow.collectAsState()
-    val flowing by messagingViewModel.flowing.collectAsState()
+    LaunchedEffect(key1 = true) {
+        messagingViewModel.setChatRoomUID(chatRoomUID = chatRoomUid)
+    }
 
-//    LaunchedEffect(key1 = Unit) {
-//        messagingViewModel.listenToChatRoomMessages(chatRoomUid)
-//    }
-
+    DisposableEffect(true) {
+        onDispose {
+            messagingViewModel.resetChatRoomUID()
+        }
+    }
 
     val showMessageList by messagingViewModel.showMessageList.collectAsState()
 
@@ -58,6 +61,7 @@ fun SingleChatRoom(
         Column(
             modifier = Modifier
                 .padding(10.dp)
+                .fillMaxWidth()
         ) {
 
             LargeText(
@@ -71,9 +75,11 @@ fun SingleChatRoom(
                     text = stringResource(id = R.string.say_hi),
                     modifier = Modifier
                         .weight(1.0f)
+                        .align(Alignment.CenterHorizontally)
                 )
             }
             LazyColumn(
+                reverseLayout = true,
                 modifier = Modifier
                     .weight(1.0f)
                     .padding(bottom = 70.dp)
