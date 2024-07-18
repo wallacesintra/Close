@@ -74,7 +74,7 @@ fun ChangeProfileImg(
                 modifier = Modifier
                     .weight(1.0f)
                     .fillMaxWidth()
-                    .fillMaxHeight(0.5f)
+                    .fillMaxHeight(0.8f)
             ) {
                 ProfileImgOptions(changeProfileImgEvent)
             }

@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
@@ -23,10 +24,13 @@ import com.example.close.presentation.location.models.SharingState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class LocationViewModel(
+    private val savedStateHandle: SavedStateHandle,
     private val locationDataSource: LocationDataSource,
     private val closeUserDataSource: CloseUserDataSource,
 ): ViewModel() {
@@ -38,6 +42,8 @@ class LocationViewModel(
     val location: StateFlow<LocationModel?> get() = _location
 
     var sharingState: SharingState by mutableStateOf(SharingState.Success(friendsLocationList = emptyList()))
+
+//    private val _friendsLocation = locationDataSource.getFriendsLocation(userUID = )
 
 
     fun createLocationContainer(userUID: String){
@@ -124,18 +130,33 @@ class LocationViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val friendsLocationList = mutableListOf<FriendLocation>()
-                val locationList = locationDataSource.getFriendsLocationNotFlow(userUID = userUID)
+                locationDataSource.getFriendsLocation(userUID = userUID)
+                    .catch { exception -> Log.w("Getting Location detail", "$exception") }
+                    .map{ locationDetails ->
+                    locationDetails.forEach { detail ->
+                        val user = closeUserDataSource.getCloseUserByUid(closeUid = detail.userUID)
 
-                locationList.forEach { location ->
-                    val user = closeUserDataSource.getCloseUserByUid(closeUid = location.userUID)
+                        Log.d("Getting Location detail", "location from $detail")
 
-                    Log.d("Getting Location detail", "location from $location")
-                    friendsLocationList.add(
-                        FriendLocation(
-                            closerUser = user,
-                            locationCoordinates = location.locationDetail
+                        friendsLocationList.add(
+                            FriendLocation(
+                                closerUser = user,
+                                locationCoordinates = detail.locationDetail
+                            )
                         )
-                    )
+                    }
+                }
+
+//                locationList.forEach { location ->
+//                    val user = closeUserDataSource.getCloseUserByUid(closeUid = location.userUID)
+//
+//                    Log.d("Getting Location detail", "location from $location")
+//                    friendsLocationList.add(
+//                        FriendLocation(
+//                            closerUser = user,
+//                            locationCoordinates = location.locationDetail
+//                        )
+//                    )
 //                    closeUserDataSource.getCloseUserByUid(closeUid = location.userUID).let { user ->
 //                        friendsLocationList.add(
 //                            FriendLocation(
@@ -144,7 +165,7 @@ class LocationViewModel(
 //                            )
 //                        )
 //                    }
-                }
+//                }
                 Log.d("LocationSharing", "Successfully received ${friendsLocationList.size} locations")
                 sharingState = SharingState.Success(friendsLocationList = friendsLocationList)
             } catch (e: Exception) {
@@ -164,6 +185,7 @@ class LocationViewModel(
 
 
                 LocationViewModel(
+                    savedStateHandle = savedStateHandle,
                     locationDataSource = locationDataSource,
                     closeUserDataSource = closeUserDataSource
                 )

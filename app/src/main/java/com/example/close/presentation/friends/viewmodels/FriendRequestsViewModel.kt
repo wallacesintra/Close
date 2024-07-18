@@ -68,7 +68,6 @@ class FriendRequestsViewModel(
                         requestUid = request.requestUid,
                         senderUid = sender.uid,
                         senderCloseUserDetails = sender,
-//                        senderUsername = sender.username,
                         response = request.accepted
                     )
                 }

@@ -23,7 +23,6 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
-import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.coroutines.resume
 
 class LocationDataSource(
@@ -94,28 +93,23 @@ class LocationDataSource(
 
     override suspend fun getFriendsLocation(userUID: String): Flow<List<FriendLocationDetail>> =
        callbackFlow {
-           val hasResumed = AtomicBoolean(false)
-
-           val registration = firestoreDB.collection(closeFriendsLocation).document(userUID)
+           val listener = firestoreDB.collection(closeFriendsLocation)
+               .document(userUID)
                .addSnapshotListener { snapshot, error ->
                    if (error != null){
-                       if (hasResumed.compareAndSet(false, true)){
-                           close(error)
-                       }
-                   } else {
-                       snapshot?.let {
-                           val locationsList = it.toObject<FriendsLocation>()?.friendsLocationList
-
-                           if (locationsList != null && hasResumed.compareAndSet(false, true)){
-                               trySend(locationsList)
-                           }
-                       }
+                       close()
+                       Log.w("Location Sharing", "fetching friends location failed with $error")
+                       return@addSnapshotListener
                    }
+
+                   val friendsLocation = snapshot?.toObject<FriendsLocation>()
+                   Log.d("Location Sharing", "friends location ${friendsLocation!!.friendsLocationList.size}")
+
+                   trySend(friendsLocation.friendsLocationList)
+
                }
 
-           awaitClose {
-               registration.remove()
-           }
+           awaitClose { listener.remove() }
     }
 
 //    override suspend fun getFriendsLocationNotFlow(userUID: String): List<FriendLocationDetail> = withContext(Dispatchers.IO) {
@@ -196,7 +190,7 @@ class LocationDataSource(
         val deferred = CompletableDeferred<Unit>()
 
         val location = FriendsLocation(
-            userUID = userUID,
+            friendUID = userUID,
         )
 
         firestoreDB.collection(closeFriendsLocation).document(userUID)
