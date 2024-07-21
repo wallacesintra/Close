@@ -29,6 +29,7 @@ fun MapView(
 
     val context = LocalContext.current
 
+
     val currentUserLocation = LatLng(locationDetails.lat, locationDetails.long)
 
     val cameraPositionState = rememberCameraPositionState {
@@ -63,8 +64,7 @@ fun MapView(
                     if (sharingState.friendsLocationList.isNotEmpty()){
                         for (location in sharingState.friendsLocationList){
 
-                            val friendLocation =
-                                location.locationCoordinates?.let { LatLng(it.latitude, location.locationCoordinates.longitude) }
+                            val friendLocation = location.locationCoordinates?.let { LatLng(it.locationDetail.latitude, location.locationCoordinates.locationDetail.longitude) }
                             Marker(
                                 state = MarkerState(position = friendLocation!!),
                                 icon = markerIcon,
@@ -75,21 +75,6 @@ fun MapView(
                     }
                 }
             }
-
-//            if (friendLocation.isNotEmpty()){
-//                for (location in friendLocation){
-//                    Marker(
-//                        state = MarkerState(position = location.locationCoordinates!!),
-//                        icon = markerIcon,
-//                        title = location.closerUser.username,
-////                    tag = "friend tag",
-////                    onClick = { true},
-//                        onInfoWindowLongClick = { Log.i("Location onClick", "Location clicked")}
-//                    )
-//                }
-//            }
-
-
         }
 
     }

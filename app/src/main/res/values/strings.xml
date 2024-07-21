@@ -53,4 +53,6 @@
     
     <string name="say_hi">Say Hey</string>
 
+    <string name="turn_on_location">Turn on Location</string>
+
 </resources>

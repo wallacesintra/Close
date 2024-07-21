@@ -42,7 +42,7 @@ import com.example.close.presentation.friends.viewmodels.FriendRequestsViewModel
 import com.example.close.presentation.friends.viewmodels.SearchUserViewModel
 import com.example.close.presentation.location.screens.CurrentLocation
 import com.example.close.presentation.location.viewmodel.LocationViewModel
-import com.example.close.presentation.location.viewmodel.SharingLocationViewModel
+//import com.example.close.presentation.location.viewmodel.SharingLocationViewModel
 import com.example.close.presentation.messaging.screens.MessageScreen
 import com.example.close.presentation.messaging.screens.SingleChatRoom
 import com.example.close.presentation.messaging.viewmodel.MessagingViewModel
@@ -75,7 +75,7 @@ fun NavigationHost(
     val locationDetails= locationViewModel.locationState
 
     //sharing location viewmodel
-    val sharingViewModel: SharingLocationViewModel = viewModel(factory = SharingLocationViewModel.Factory)
+//    val sharingViewModel: SharingLocationViewModel = viewModel(factory = SharingLocationViewModel.Factory)
 
     //search user viewmodel
     val searchUserViewModel: SearchUserViewModel = viewModel(factory = SearchUserViewModel.Factory)

@@ -15,18 +15,16 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.close.CloseApp
 import com.example.close.data.database.CloseUserDataSource
 import com.example.close.data.location.LocationDataSource
-import com.example.close.data.location.model.FriendLocationDetail
 import com.example.close.data.location.model.LocationModel
 import com.example.close.presentation.location.models.FriendLocation
 import com.example.close.presentation.location.models.LocationDetails
 import com.example.close.presentation.location.models.LocationState
 import com.example.close.presentation.location.models.SharingState
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class LocationViewModel(
@@ -34,6 +32,16 @@ class LocationViewModel(
     private val locationDataSource: LocationDataSource,
     private val closeUserDataSource: CloseUserDataSource,
 ): ViewModel() {
+
+    init {
+        viewModelScope.launch {
+            val location = locationDataSource.getLocationByUserUIDFlow("Cuo4cDX5UCRXs4J4zOaIJ6PLP0d2")
+            location.collect{value ->
+                println(value)
+                Log.d("location test viewmodel", value.locationDetail.latitude.toString())
+            }
+        }
+    }
 
 
     var locationState: LocationState by mutableStateOf(LocationState.Loading)
@@ -92,80 +100,78 @@ class LocationViewModel(
 
 
     /**
-     * sharing location to user's friends
+     * update location detail
      * @param userUID : current user uid
-     * @param friendsLIst: friends uid list
      * @param locationDetail: location latitude and longitude
      */
-    fun shareLocationToFriends(userUID: String,  friendsLIst: List<String>,locationDetail: LocationModel){
+    fun updateLocationDetails(userUID: String, friendsLIst: List<String>, locationDetail: LocationModel){
 
 
         viewModelScope.launch(Dispatchers.IO){
-            val userLocationDetail = FriendLocationDetail(
+            delay(2000)
+//            val userLocationDetail = FriendLocationDetail(
+//                userUID = userUID,
+//                locationDetail = locationDetail
+//            )
+
+            locationDataSource.setLocationDetail(
                 userUID = userUID,
                 locationDetail = locationDetail
             )
 
-            for (friendUID in friendsLIst){
-
-                Log.d("location sharing", "location fetched $friendUID")
-
-                locationDataSource.shareLocation(
-                    friendUID = friendUID,
-                    friendsLocationDetail = userLocationDetail
-                )
-            }
+//            for (friendUID in friendsLIst){
+//
+//                Log.d("location sharing", "location fetched $friendUID")
+//
+//                locationDataSource.shareLocation(
+//                    friendUID = friendUID,
+//                    friendsLocationDetail = userLocationDetail
+//                )
+//
+//                locationDataSource.setLocationDetail(
+//                    userUID =  ,
+//                    locationDetail =
+//                )
+//            }
 
         }
     }
+
+
 
 
     /**
      * get location from friends
      *
      * @param userUID current user uid
+     * @param friendsLIst friend uid list
      */
-    fun receiveLocationsFromFriends(userUID: String) {
+    fun getFriendsLocationDetails(userUID: String, friendsLIst: List<String>) {
         Log.d("LocationSharing", "Attempting to receive locations for user $userUID")
         viewModelScope.launch(Dispatchers.IO) {
             try {
+//                delay(2000)
+
                 val friendsLocationList = mutableListOf<FriendLocation>()
-                locationDataSource.getFriendsLocation(userUID = userUID)
-                    .catch { exception -> Log.w("Getting Location detail", "$exception") }
-                    .map{ locationDetails ->
-                    locationDetails.forEach { detail ->
-                        val user = closeUserDataSource.getCloseUserByUid(closeUid = detail.userUID)
 
-                        Log.d("Getting Location detail", "location from $detail")
+                friendsLIst.forEach { friendUID ->
+                    val locationDetail = locationDataSource.getLocationByUserUID(userUID = friendUID)
+                    val user = closeUserDataSource.getCloseUserByUid(closeUid = friendUID)
 
-                        friendsLocationList.add(
-                            FriendLocation(
-                                closerUser = user,
-                                locationCoordinates = detail.locationDetail
-                            )
+//                    val locationCoordinates = locationDataSource.getLocationByUserUIDFlow(userUID = friendUID)
+
+                    Log.d("Getting Location detail", "location from $locationDetail")
+                    Log.d("Getting Location detail", "location from $user")
+
+
+                    friendsLocationList.add(
+                        FriendLocation(
+                            closerUser = closeUserDataSource.getCloseUserByUid(closeUid = friendUID),
+                            locationCoordinates = locationDataSource.getLocationByUserUID(userUID = friendUID)
                         )
-                    }
+                    )
                 }
 
-//                locationList.forEach { location ->
-//                    val user = closeUserDataSource.getCloseUserByUid(closeUid = location.userUID)
-//
-//                    Log.d("Getting Location detail", "location from $location")
-//                    friendsLocationList.add(
-//                        FriendLocation(
-//                            closerUser = user,
-//                            locationCoordinates = location.locationDetail
-//                        )
-//                    )
-//                    closeUserDataSource.getCloseUserByUid(closeUid = location.userUID).let { user ->
-//                        friendsLocationList.add(
-//                            FriendLocation(
-//                                closerUser = user,
-//                                locationCoordinates = location.locationDetail
-//                            )
-//                        )
-//                    }
-//                }
                 Log.d("LocationSharing", "Successfully received ${friendsLocationList.size} locations")
                 sharingState = SharingState.Success(friendsLocationList = friendsLocationList)
             } catch (e: Exception) {
