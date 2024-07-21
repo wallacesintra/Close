@@ -81,6 +81,7 @@ dependencies {
     // Declare the dependency for the Cloud Firestore library
     implementation("com.google.firebase:firebase-firestore")
     implementation("androidx.media3:media3-common:1.3.1")
+    implementation("androidx.compose.ui:ui-text-google-fonts:1.6.8")
 
     //
     val nav_version = "2.7.7"
@@ -116,10 +117,6 @@ dependencies {
 
     //gson
     implementation ("com.google.code.gson:gson:2.11.0")
-
-
-
-
 
 
     implementation("androidx.core:core-ktx:1.13.1")

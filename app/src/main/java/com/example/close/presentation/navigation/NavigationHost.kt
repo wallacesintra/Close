@@ -110,9 +110,9 @@ fun NavigationHost(
                                 IconButton(
                                     colors = IconButtonColors(
                                         containerColor = if (currentDestination?.hierarchy?.any { it.route == screen.route } == true)
-                                            MaterialTheme.colorScheme.primary else Color.Transparent,
+                                            MaterialTheme.colorScheme.secondaryContainer else Color.Transparent,
                                         contentColor = if (currentDestination?.hierarchy?.any { it.route == screen.route } == true)
-                                            MaterialTheme.colorScheme.background else MaterialTheme.colorScheme.primary,
+                                            MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.primary,
                                         disabledContainerColor = Color.Transparent,
                                         disabledContentColor = MaterialTheme.colorScheme.primary
                                     ),
@@ -207,9 +207,9 @@ fun NavigationHost(
 
             composable(Screen.Location.route){
                 CurrentLocation(
-                    locationViewModel = locationViewModel,
                     friendsList = currentUser.friends,
-                    currentUserUID = currentUser.uid
+                    currentUser = currentUser,
+                    locationViewModel = locationViewModel
                 )
 
             }

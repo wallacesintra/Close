@@ -10,6 +10,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -52,13 +53,19 @@ fun SearchUser(
             onValueChange = searchUserViewModel::onSearchTextChange,
             shape = RoundedCornerShape(40.dp),
             colors = TextFieldDefaults.colors(
+//                unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                focusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent
             ),
             leadingIcon = {
-                           Icon(imageVector = Icons.Default.Search, contentDescription = stringResource(
-                               id = R.string.search_user
-                           ))
+                           Icon(
+                               imageVector = Icons.Default.Search,
+                               tint = MaterialTheme.colorScheme.secondary,
+                               contentDescription = stringResource(
+                                   id = R.string.search_user
+                               )
+                           )
             },
             modifier = Modifier
                 .padding(10.dp)

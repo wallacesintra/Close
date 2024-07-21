@@ -146,8 +146,8 @@ class LocationViewModel(
      * @param userUID current user uid
      * @param friendsLIst friend uid list
      */
-    fun getFriendsLocationDetails(userUID: String, friendsLIst: List<String>) {
-        Log.d("LocationSharing", "Attempting to receive locations for user $userUID")
+    fun getFriendsLocationDetails(friendsLIst: List<String>) {
+//        Log.d("LocationSharing", "Attempting to receive locations for user $userUID")
         viewModelScope.launch(Dispatchers.IO) {
             try {
 //                delay(2000)

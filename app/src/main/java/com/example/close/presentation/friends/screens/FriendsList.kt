@@ -67,7 +67,7 @@ fun FriendsScreen(
             modifier = Modifier
                 .padding(6.dp)
                 .clip(RoundedCornerShape(40.dp))
-                .background(MaterialTheme.colorScheme.primaryContainer)
+                .background(MaterialTheme.colorScheme.secondaryContainer)
                 .padding(10.dp)
                 .clickable(
                     onClick = goToFriendRequest

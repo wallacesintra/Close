@@ -12,7 +12,7 @@ import androidx.compose.ui.unit.dp
 import com.example.close.R
 import com.example.close.data.database.models.CloseUserData
 import com.example.close.presentation.models.profileImagesMap
-import com.example.close.presentation.profile.components.ChangeProfileImg
+import com.example.close.presentation.profile.components.EditProfileImg
 import com.example.close.presentation.profile.components.EditDetail
 import com.example.close.presentation.profile.viewmodels.CurrentUserProfileDetailsViewModel
 
@@ -32,7 +32,7 @@ fun EditProfileScreen(
     ) {
         //edit profile image
         profileImagesMap[userData.profileImg]?.let {
-            ChangeProfileImg(
+            EditProfileImg(
                 currentProfileImgRes = it.imgResId,
                 changeProfileImgEvent = { newProfile ->
                     currentUserProfileDetailsViewModel.updateCurrentUserDetails(
