@@ -79,9 +79,19 @@ fun MapView(
                                 context = context,
                                 resource = profileImagesMap[location.closerUser.profileImg]!!.imgResId
                             )
+                            Circle(
+                                center = LatLng(
+                                    friendLocation!!.latitude,
+                                    friendLocation.longitude
+                                ),
+                                radius = 50.00,
+                                strokeWidth = 1.0f,
+                                fillColor = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.4f),
+                                strokeColor = MaterialTheme.colorScheme.primary
+                            )
 
                             Marker(
-                                state = MarkerState(position = friendLocation!!),
+                                state = MarkerState(position = friendLocation),
                                 icon = friendIconMarker,
                                 title = location.closerUser.username,
                                 onInfoWindowLongClick = { Log.i("Location onClick", "Location clicked")}

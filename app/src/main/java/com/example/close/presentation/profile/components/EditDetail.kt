@@ -84,7 +84,7 @@ fun EditDetail(
                 Icon(
                     painter = painter,
                     contentDescription = "edit $detailToEdit",
-                    tint = MaterialTheme.colorScheme.tertiary,
+                    tint = MaterialTheme.colorScheme.secondary,
                     modifier = modifier
                         .padding(10.dp)
                         .size(30.dp)

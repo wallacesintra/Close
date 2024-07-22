@@ -54,6 +54,7 @@ fun SearchUser(
             shape = RoundedCornerShape(40.dp),
             colors = TextFieldDefaults.colors(
 //                unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                cursorColor = MaterialTheme.colorScheme.secondary,
                 focusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent
