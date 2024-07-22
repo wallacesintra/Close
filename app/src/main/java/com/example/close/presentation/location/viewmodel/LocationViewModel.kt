@@ -26,6 +26,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.sin
+import kotlin.math.sqrt
 
 class LocationViewModel(
     private val savedStateHandle: SavedStateHandle,
@@ -35,6 +39,8 @@ class LocationViewModel(
 
     init {
         viewModelScope.launch {
+//            getCurrentLocation()
+
             val location = locationDataSource.getLocationByUserUIDFlow("Cuo4cDX5UCRXs4J4zOaIJ6PLP0d2")
             location.collect{value ->
                 println(value)
@@ -104,37 +110,45 @@ class LocationViewModel(
      * @param userUID : current user uid
      * @param locationDetail: location latitude and longitude
      */
-    fun updateLocationDetails(userUID: String, friendsLIst: List<String>, locationDetail: LocationModel){
-
-
+    fun updateLocationDetails(userUID: String, locationDetail: LocationModel){
         viewModelScope.launch(Dispatchers.IO){
-            delay(2000)
-//            val userLocationDetail = FriendLocationDetail(
-//                userUID = userUID,
-//                locationDetail = locationDetail
-//            )
+            delay(500)
 
             locationDataSource.setLocationDetail(
                 userUID = userUID,
                 locationDetail = locationDetail
             )
-
-//            for (friendUID in friendsLIst){
-//
-//                Log.d("location sharing", "location fetched $friendUID")
-//
-//                locationDataSource.shareLocation(
-//                    friendUID = friendUID,
-//                    friendsLocationDetail = userLocationDetail
-//                )
-//
-//                locationDataSource.setLocationDetail(
-//                    userUID =  ,
-//                    locationDetail =
-//                )
-//            }
-
         }
+    }
+
+
+    private fun calculateDistance(lat1: Double, lon1: Double, lat2: Double, lon2: Double): String {
+        val earthRadius = 6371 // Radius of the earth in kilometers
+
+        val latDistance = Math.toRadians(lat2 - lat1)
+        val lonDistance = Math.toRadians(lon2 - lon1)
+        val a = sin(latDistance / 2) * sin(latDistance / 2) +
+                cos(Math.toRadians(lat1)) * cos(Math.toRadians(lat2)) *
+                sin(lonDistance / 2) * sin(lonDistance / 2)
+        val c = 2 * atan2(sqrt(a), sqrt(1 - a))
+
+        val distance = (earthRadius * c)
+        val distanceInMetres = (distance * 1000).toInt()
+
+        return when{
+            distanceInMetres <= 1000 -> {
+                "$distanceInMetres m"
+            }
+
+            distanceInMetres > 1000000 -> {
+                "> 1k km"
+            }
+
+            else -> {
+                "${distanceInMetres/1000} km"
+            }
+        }
+
     }
 
 
@@ -142,33 +156,43 @@ class LocationViewModel(
 
     /**
      * get location from friends
-     *
-     * @param userUID current user uid
      * @param friendsLIst friend uid list
      */
     fun getFriendsLocationDetails(friendsLIst: List<String>) {
 //        Log.d("LocationSharing", "Attempting to receive locations for user $userUID")
         viewModelScope.launch(Dispatchers.IO) {
             try {
-//                delay(2000)
+                val currentUserLocation = locationDataSource.fetchCurrentLocation().first()
+
+
 
                 val friendsLocationList = mutableListOf<FriendLocation>()
 
                 friendsLIst.forEach { friendUID ->
                     val locationDetail = locationDataSource.getLocationByUserUID(userUID = friendUID)
                     val user = closeUserDataSource.getCloseUserByUid(closeUid = friendUID)
+                    val distance = calculateDistance(
+                        lat1 = currentUserLocation.latitude,
+                        lon1 = currentUserLocation.longitude,
+                        lat2 = locationDetail.locationDetail.latitude,
+                        lon2 = locationDetail.locationDetail.longitude
+                    )
 
-//                    val locationCoordinates = locationDataSource.getLocationByUserUIDFlow(userUID = friendUID)
 
                     Log.d("Getting Location detail", "location from $locationDetail")
+//                    Log.d("Getting Location detail", "$distance km away from ")
                     Log.d("Getting Location detail", "location from $user")
 
 
                     friendsLocationList.add(
                         FriendLocation(
                             closerUser = closeUserDataSource.getCloseUserByUid(closeUid = friendUID),
-                            locationCoordinates = locationDataSource.getLocationByUserUID(userUID = friendUID)
-                        )
+                            locationCoordinates = locationDataSource.getLocationByUserUID(userUID = friendUID),
+//                            locationCoordinates = locationDetail,
+                            distanceBetweenCurrentUserLocation = distance
+                    )
+
+
                     )
                 }
 
