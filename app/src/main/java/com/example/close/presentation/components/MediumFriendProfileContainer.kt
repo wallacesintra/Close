@@ -35,7 +35,7 @@ fun MediumFriendProfileContainer(
             modifier = Modifier
                 .fillMaxWidth(0.99f)
         ) {
-            ProfileImg(imageResId =imgResId ,imgSize = 60.dp, modifier = Modifier.padding(horizontal = 15.dp))
+            ProfileImg(imageResId =imgResId ,imgSize = 60.dp, modifier = Modifier.padding(end = 10.dp))
 
             Column {
                 MediumText(text = username)

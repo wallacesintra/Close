@@ -88,6 +88,8 @@ class AuthViewModel(
 
                     //create a locations container
                     locationDataSource.createLocationContainer(userUID = user.uid)
+                    //create location document
+                    locationDataSource.createLocationContainer(userUID = user.uid)
 
 
                     userData = userData.copy(

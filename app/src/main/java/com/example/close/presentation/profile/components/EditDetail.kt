@@ -84,6 +84,7 @@ fun EditDetail(
                 Icon(
                     painter = painter,
                     contentDescription = "edit $detailToEdit",
+                    tint = MaterialTheme.colorScheme.secondary,
                     modifier = modifier
                         .padding(10.dp)
                         .size(30.dp)
@@ -136,7 +137,7 @@ fun EditDetail(
                         Icon(
                             imageVector = Icons.Default.Check,
                             contentDescription = "confirm new $detailToEdit",
-                            tint = MaterialTheme.colorScheme.primary,
+                            tint = MaterialTheme.colorScheme.tertiary,
                             modifier = modifier
                                 .clickable(
                                     onClick = {

@@ -40,7 +40,7 @@ fun LargeActionContainer(
             Icon(
                 painter = iconPainter,
                 contentDescription = iconDescription,
-                tint = MaterialTheme.colorScheme.primary,
+                tint = MaterialTheme.colorScheme.secondary,
                 modifier = Modifier
                     .alpha(0.9f)
                     .padding(vertical = 4.dp)

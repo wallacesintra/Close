@@ -27,7 +27,7 @@ import com.example.close.presentation.components.ProfileImg
 //@Preview(showBackground = true, showSystemUi = true)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ChangeProfileImg(
+fun EditProfileImg(
     currentProfileImgRes: Int = R.drawable.male_black1,
     changeProfileImgEvent: (String) -> Unit
 ){
@@ -52,10 +52,10 @@ fun ChangeProfileImg(
                 IconButton(
                     onClick = {showBottomSheet = true},
                     colors = IconButtonColors(
-                        contentColor = MaterialTheme.colorScheme.onPrimary,
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        disabledContentColor = MaterialTheme.colorScheme.primary,
-                        disabledContainerColor = MaterialTheme.colorScheme.onPrimary
+                        contentColor = MaterialTheme.colorScheme.onSecondary,
+                        containerColor = MaterialTheme.colorScheme.secondary,
+                        disabledContentColor = MaterialTheme.colorScheme.secondary,
+                        disabledContainerColor = MaterialTheme.colorScheme.onSecondary
                     )
                 ) {
                     Icon(
@@ -74,7 +74,7 @@ fun ChangeProfileImg(
                 modifier = Modifier
                     .weight(1.0f)
                     .fillMaxWidth()
-                    .fillMaxHeight(0.5f)
+                    .fillMaxHeight(0.8f)
             ) {
                 ProfileImgOptions(changeProfileImgEvent)
             }

@@ -8,6 +8,7 @@ import android.util.Log
 import androidx.core.app.ActivityCompat
 import com.example.close.data.location.model.FriendLocationDetail
 import com.example.close.data.location.model.FriendsLocation
+import com.example.close.data.location.model.LocationDetail
 import com.example.close.data.location.model.LocationModel
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
@@ -23,7 +24,6 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
-import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.coroutines.resume
 
 class LocationDataSource(
@@ -36,6 +36,8 @@ class LocationDataSource(
     private val LOCATION_PERMISSION_REQUEST_CODE = 1
 
     private val closeFriendsLocation = "CloseFriendsCoordinates"
+
+    private val closeLocationCollection = "CloseLocationCollection"
 
     override suspend fun fetchCurrentLocation(): Flow<LocationModel> {
         return callbackFlow {
@@ -94,28 +96,23 @@ class LocationDataSource(
 
     override suspend fun getFriendsLocation(userUID: String): Flow<List<FriendLocationDetail>> =
        callbackFlow {
-           val hasResumed = AtomicBoolean(false)
-
-           val registration = firestoreDB.collection(closeFriendsLocation).document(userUID)
+           val listener = firestoreDB.collection(closeFriendsLocation)
+               .document(userUID)
                .addSnapshotListener { snapshot, error ->
                    if (error != null){
-                       if (hasResumed.compareAndSet(false, true)){
-                           close(error)
-                       }
-                   } else {
-                       snapshot?.let {
-                           val locationsList = it.toObject<FriendsLocation>()?.friendsLocationList
-
-                           if (locationsList != null && hasResumed.compareAndSet(false, true)){
-                               trySend(locationsList)
-                           }
-                       }
+                       close()
+                       Log.w("Location Sharing", "fetching friends location failed with $error")
+                       return@addSnapshotListener
                    }
+
+                   val friendsLocation = snapshot?.toObject<FriendsLocation>()
+                   Log.d("Location Sharing", "friends location ${friendsLocation!!.friendsLocationList.size}")
+
+                   trySend(friendsLocation.friendsLocationList)
+
                }
 
-           awaitClose {
-               registration.remove()
-           }
+           awaitClose { listener.remove() }
     }
 
 //    override suspend fun getFriendsLocationNotFlow(userUID: String): List<FriendLocationDetail> = withContext(Dispatchers.IO) {
@@ -196,7 +193,7 @@ class LocationDataSource(
         val deferred = CompletableDeferred<Unit>()
 
         val location = FriendsLocation(
-            userUID = userUID,
+            friendUID = userUID,
         )
 
         firestoreDB.collection(closeFriendsLocation).document(userUID)
@@ -244,5 +241,170 @@ class LocationDataSource(
         }
         val documentSnapshot = firestoreDB.collection(closeFriendsLocation).document(userUID).get().await()
         return documentSnapshot.exists()
+    }
+
+//    override suspend fun getLocationByUserUID(userUID: String): LocationModel = withContext(Dispatchers.IO){
+//        suspendCancellableCoroutine<LocationModel> { continuation ->
+//            if (userUID.isBlank()){
+//                Log.w("Location Listening", "invalid user uid : $userUID")
+////                continuation.resume(LocationModel())
+//                return@suspendCancellableCoroutine
+//            }
+//
+//            firestoreDB.collection(closeLocationCollection).document(userUID)
+//                .addSnapshotListener { snapshot, error ->
+//                    if (error != null ){
+//                        Log.w("Location Listening", "listening failed with $error")
+//                        return@addSnapshotListener
+//                    }
+//                    val locationDetail = snapshot?.toObject<LocationModel>()
+//                    Log.d("Location Listening", "listening successful")
+//
+//                    continuation.resume(locationDetail!!)
+//
+////                    if (snapshot != null && snapshot.exists()){
+////
+////                    }
+////                    else {
+////                        Log.d("Location Listening", "empty")
+////                        continuation.resume(LocationModel())
+////                    }
+//                }
+//        }
+//    }
+
+//    override suspend fun getLocationByUserUID(userUID: String): LocationDetail {
+//        val deferred = CompletableDeferred<LocationDetail>()
+//
+//        firestoreDB.collection(closeLocationCollection).document("Cuo4cDX5UCRXs4J4zOaIJ6PLP0d2")
+//            .get()
+//
+//            .addOnSuccessListener { detail ->
+//                val location = detail.toObject<LocationDetail>()
+//
+//                if (location != null){
+//                    Log.d("User current location now", "$location")
+//                    deferred.complete(location)
+//                }
+//            }
+//            .addOnFailureListener {error ->
+//                Log.w("User current location now", "$error")
+//                deferred.completeExceptionally(error)
+//            }
+//
+//
+//        return withContext(Dispatchers.IO){
+//            deferred.await()
+//        }
+//    }
+
+    override suspend fun getLocationByUserUID(userUID: String): LocationDetail {
+        if (userUID.isBlank()) {
+            throw IllegalArgumentException("User UID cannot be blank")
+        }
+
+        val deferred = CompletableDeferred<LocationDetail>()
+
+        firestoreDB.collection(closeLocationCollection).document(userUID)
+            .get()
+            .addOnSuccessListener { documentSnapshot ->
+                if (documentSnapshot.exists()) {
+                    val location = documentSnapshot.toObject<LocationDetail>()
+                    if (location != null) {
+                        Log.d("User current location now", "$location")
+                        deferred.complete(location)
+                    } else {
+                        Log.w("User current location now", "Location data is null")
+                        deferred.completeExceptionally(
+                            KotlinNullPointerException("Location data is null")
+                        )
+                    }
+                } else {
+                    Log.w("User current location now", "Document does not exist")
+                    deferred.completeExceptionally(
+                        NoSuchElementException("Document does not exist")
+                    )
+                }
+            }
+            .addOnFailureListener { error ->
+                Log.w("User current location now", "$error")
+                deferred.completeExceptionally(error)
+            }
+
+        return withContext(Dispatchers.IO) {
+            deferred.await() ?: throw NoSuchElementException("Failed to fetch location detail")
+        }
+    }
+
+    override suspend fun setLocationDetail(
+        userUID: String,
+        locationDetail: LocationModel
+    ) {
+        if (userUID.isBlank()){
+            return
+        }
+
+        val deferred = CompletableDeferred<Unit>()
+
+        val newLocation = hashMapOf(
+//            "timeStamp" to FieldValue.serverTimestamp(),
+            "locationDetail" to locationDetail
+        )
+
+        firestoreDB.collection(closeLocationCollection).document(userUID)
+            .set(newLocation)
+            .addOnFailureListener { e ->
+                Log.w("Setting Location", "setting location failed with $e")
+                deferred.completeExceptionally(e)
+            }
+            .addOnSuccessListener {
+                Log.d("Setting Location", "setting location successful")
+                deferred.complete(Unit)
+            }
+
+        withContext(Dispatchers.IO){
+            deferred.await()
+        }
+    }
+
+    override suspend fun createLocationDocument(userUID: String) {
+
+        val deferred = CompletableDeferred<Unit>()
+
+        val newLocation = hashMapOf(
+//            "timeStamp" to FieldValue.serverTimestamp(),
+            "locationDetail" to LocationModel()
+        )
+
+        firestoreDB.collection(closeLocationCollection).document(userUID)
+            .set(newLocation)
+            .addOnFailureListener { e ->
+                Log.w("Setting Location", "setting location failed with $e")
+                deferred.completeExceptionally(e)
+            }
+            .addOnSuccessListener {
+                Log.d("Setting Location", "setting location successful")
+                deferred.complete(Unit)
+            }
+    }
+
+    override suspend fun getLocationByUserUIDFlow(userUID: String): Flow<LocationDetail> =
+        callbackFlow{
+            val listener = firestoreDB.collection(closeLocationCollection)
+                .document(userUID)
+                .addSnapshotListener { value, error ->
+                    if(error != null){
+                        close()
+                        Log.w("Setting Location", error)
+                        return@addSnapshotListener
+                    }
+
+                    val locationDetail = value?.toObject<LocationDetail>()
+                    Log.d("Setting Location", "location $locationDetail")
+                    trySend(locationDetail!!)
+                }
+
+            awaitClose { listener.remove() }
+
     }
 }

@@ -34,7 +34,7 @@ fun FriendsList(
 
         MediumText(
             text = if (friendsList.size > 1 || friendsList.isEmpty()) "${friendsList.size} friends" else "${friendsList.size} friend",
-            modifier = Modifier.padding(horizontal = 10.dp),
+            modifier = Modifier.padding(vertical =  10.dp),
             isBold = true
         )
 
@@ -58,16 +58,16 @@ fun FriendsScreen(
         currentUserProfileDetailsViewModel.loadFriendsList(friendsList)
     }
 
-    Column {
-        LargeText(text = stringResource(id = R.string.friends), modifier = Modifier.padding(10.dp), isBold = false)
+    Column(
+        modifier = Modifier.padding(10.dp)
+    ){
+        LargeText(text = stringResource(id = R.string.friends), isBold = false, modifier = Modifier.padding(vertical = 10.dp))
 
         MediumText(
-//            isBold = true,
             text = stringResource(id = R.string.friend_requests),
             modifier = Modifier
-                .padding(6.dp)
                 .clip(RoundedCornerShape(40.dp))
-                .background(MaterialTheme.colorScheme.primaryContainer)
+                .background(MaterialTheme.colorScheme.secondaryContainer)
                 .padding(10.dp)
                 .clickable(
                     onClick = goToFriendRequest

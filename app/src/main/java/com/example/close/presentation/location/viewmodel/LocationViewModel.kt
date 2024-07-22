@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
@@ -14,22 +15,33 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.close.CloseApp
 import com.example.close.data.database.CloseUserDataSource
 import com.example.close.data.location.LocationDataSource
-import com.example.close.data.location.model.FriendLocationDetail
 import com.example.close.data.location.model.LocationModel
 import com.example.close.presentation.location.models.FriendLocation
 import com.example.close.presentation.location.models.LocationDetails
 import com.example.close.presentation.location.models.LocationState
 import com.example.close.presentation.location.models.SharingState
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class LocationViewModel(
+    private val savedStateHandle: SavedStateHandle,
     private val locationDataSource: LocationDataSource,
     private val closeUserDataSource: CloseUserDataSource,
 ): ViewModel() {
+
+    init {
+        viewModelScope.launch {
+            val location = locationDataSource.getLocationByUserUIDFlow("Cuo4cDX5UCRXs4J4zOaIJ6PLP0d2")
+            location.collect{value ->
+                println(value)
+                Log.d("location test viewmodel", value.locationDetail.latitude.toString())
+            }
+        }
+    }
 
 
     var locationState: LocationState by mutableStateOf(LocationState.Loading)
@@ -38,6 +50,8 @@ class LocationViewModel(
     val location: StateFlow<LocationModel?> get() = _location
 
     var sharingState: SharingState by mutableStateOf(SharingState.Success(friendsLocationList = emptyList()))
+
+//    private val _friendsLocation = locationDataSource.getFriendsLocation(userUID = )
 
 
     fun createLocationContainer(userUID: String){
@@ -86,65 +100,78 @@ class LocationViewModel(
 
 
     /**
-     * sharing location to user's friends
+     * update location detail
      * @param userUID : current user uid
-     * @param friendsLIst: friends uid list
      * @param locationDetail: location latitude and longitude
      */
-    fun shareLocationToFriends(userUID: String,  friendsLIst: List<String>,locationDetail: LocationModel){
+    fun updateLocationDetails(userUID: String, friendsLIst: List<String>, locationDetail: LocationModel){
 
 
         viewModelScope.launch(Dispatchers.IO){
-            val userLocationDetail = FriendLocationDetail(
+            delay(2000)
+//            val userLocationDetail = FriendLocationDetail(
+//                userUID = userUID,
+//                locationDetail = locationDetail
+//            )
+
+            locationDataSource.setLocationDetail(
                 userUID = userUID,
                 locationDetail = locationDetail
             )
 
-            for (friendUID in friendsLIst){
-
-                Log.d("location sharing", "location fetched $friendUID")
-
-                locationDataSource.shareLocation(
-                    friendUID = friendUID,
-                    friendsLocationDetail = userLocationDetail
-                )
-            }
+//            for (friendUID in friendsLIst){
+//
+//                Log.d("location sharing", "location fetched $friendUID")
+//
+//                locationDataSource.shareLocation(
+//                    friendUID = friendUID,
+//                    friendsLocationDetail = userLocationDetail
+//                )
+//
+//                locationDataSource.setLocationDetail(
+//                    userUID =  ,
+//                    locationDetail =
+//                )
+//            }
 
         }
     }
+
+
 
 
     /**
      * get location from friends
      *
      * @param userUID current user uid
+     * @param friendsLIst friend uid list
      */
-    fun receiveLocationsFromFriends(userUID: String) {
-        Log.d("LocationSharing", "Attempting to receive locations for user $userUID")
+    fun getFriendsLocationDetails(friendsLIst: List<String>) {
+//        Log.d("LocationSharing", "Attempting to receive locations for user $userUID")
         viewModelScope.launch(Dispatchers.IO) {
             try {
+//                delay(2000)
+
                 val friendsLocationList = mutableListOf<FriendLocation>()
-                val locationList = locationDataSource.getFriendsLocationNotFlow(userUID = userUID)
 
-                locationList.forEach { location ->
-                    val user = closeUserDataSource.getCloseUserByUid(closeUid = location.userUID)
+                friendsLIst.forEach { friendUID ->
+                    val locationDetail = locationDataSource.getLocationByUserUID(userUID = friendUID)
+                    val user = closeUserDataSource.getCloseUserByUid(closeUid = friendUID)
 
-                    Log.d("Getting Location detail", "location from $location")
+//                    val locationCoordinates = locationDataSource.getLocationByUserUIDFlow(userUID = friendUID)
+
+                    Log.d("Getting Location detail", "location from $locationDetail")
+                    Log.d("Getting Location detail", "location from $user")
+
+
                     friendsLocationList.add(
                         FriendLocation(
-                            closerUser = user,
-                            locationCoordinates = location.locationDetail
+                            closerUser = closeUserDataSource.getCloseUserByUid(closeUid = friendUID),
+                            locationCoordinates = locationDataSource.getLocationByUserUID(userUID = friendUID)
                         )
                     )
-//                    closeUserDataSource.getCloseUserByUid(closeUid = location.userUID).let { user ->
-//                        friendsLocationList.add(
-//                            FriendLocation(
-//                                closerUser = user,
-//                                locationCoordinates = location.locationDetail
-//                            )
-//                        )
-//                    }
                 }
+
                 Log.d("LocationSharing", "Successfully received ${friendsLocationList.size} locations")
                 sharingState = SharingState.Success(friendsLocationList = friendsLocationList)
             } catch (e: Exception) {
@@ -164,6 +191,7 @@ class LocationViewModel(
 
 
                 LocationViewModel(
+                    savedStateHandle = savedStateHandle,
                     locationDataSource = locationDataSource,
                     closeUserDataSource = closeUserDataSource
                 )

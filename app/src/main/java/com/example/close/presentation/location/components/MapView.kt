@@ -3,15 +3,18 @@ package com.example.close.presentation.location.components
 import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.close.R
+import androidx.compose.ui.unit.dp
+import com.example.close.data.database.models.CloseUserData
 import com.example.close.presentation.components.Loading
 import com.example.close.presentation.location.models.LocationDetails
 import com.example.close.presentation.location.models.SharingState
+import com.example.close.presentation.models.profileImagesMap
 import com.example.close.utils.ConvertImgToBitmapDescriptor
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -24,10 +27,12 @@ import com.google.maps.android.compose.rememberCameraPositionState
 @Composable
 fun MapView(
     locationDetails: LocationDetails,
-    sharingState: SharingState
+    sharingState: SharingState,
+    currentUser: CloseUserData
 ) {
 
     val context = LocalContext.current
+
 
     val currentUserLocation = LatLng(locationDetails.lat, locationDetails.long)
 
@@ -35,7 +40,12 @@ fun MapView(
         position = CameraPosition.fromLatLngZoom(currentUserLocation, 17f)
     }
 
-    val markerIcon = ConvertImgToBitmapDescriptor().getBitmapDescriptorFromBitmap(context = context, R.drawable.female_dp)
+    val bitImageConverter = ConvertImgToBitmapDescriptor()
+
+    val markerIcon = bitImageConverter.getBitmapDescriptorFromBitmap(
+        context = context,
+        resource = profileImagesMap[currentUser.profileImg]!!.imgResId
+    )
 
     Column {
         GoogleMap(
@@ -48,7 +58,7 @@ fun MapView(
                 radius = 200.00,
                 strokeWidth = 1.0f,
                 strokeColor = MaterialTheme.colorScheme.tertiary,
-                fillColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f)
+                fillColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f)
             )
             Marker(
                 state = MarkerState(position = currentUserLocation),
@@ -58,16 +68,31 @@ fun MapView(
 
             when(sharingState){
                 is SharingState.Error -> {}
-                SharingState.Loading -> { Loading() }
+                SharingState.Loading -> { Loading(modifier = Modifier.padding(10.dp)) }
                 is SharingState.Success -> {
                     if (sharingState.friendsLocationList.isNotEmpty()){
                         for (location in sharingState.friendsLocationList){
 
-                            val friendLocation =
-                                location.locationCoordinates?.let { LatLng(it.latitude, location.locationCoordinates.longitude) }
+                            val friendLocation = location.locationCoordinates?.let { LatLng(it.locationDetail.latitude, location.locationCoordinates.locationDetail.longitude) }
+
+                            val friendIconMarker = bitImageConverter.getBitmapDescriptorFromBitmap(
+                                context = context,
+                                resource = profileImagesMap[location.closerUser.profileImg]!!.imgResId
+                            )
+                            Circle(
+                                center = LatLng(
+                                    friendLocation!!.latitude,
+                                    friendLocation.longitude
+                                ),
+                                radius = 50.00,
+                                strokeWidth = 1.0f,
+                                fillColor = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.4f),
+                                strokeColor = MaterialTheme.colorScheme.primary
+                            )
+
                             Marker(
-                                state = MarkerState(position = friendLocation!!),
-                                icon = markerIcon,
+                                state = MarkerState(position = friendLocation),
+                                icon = friendIconMarker,
                                 title = location.closerUser.username,
                                 onInfoWindowLongClick = { Log.i("Location onClick", "Location clicked")}
                             )
@@ -75,21 +100,6 @@ fun MapView(
                     }
                 }
             }
-
-//            if (friendLocation.isNotEmpty()){
-//                for (location in friendLocation){
-//                    Marker(
-//                        state = MarkerState(position = location.locationCoordinates!!),
-//                        icon = markerIcon,
-//                        title = location.closerUser.username,
-////                    tag = "friend tag",
-////                    onClick = { true},
-//                        onInfoWindowLongClick = { Log.i("Location onClick", "Location clicked")}
-//                    )
-//                }
-//            }
-
-
         }
 
     }

@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
@@ -44,9 +45,11 @@ fun SingleChatRoom(
 ) {
     val messageText by messagingViewModel.messageText.collectAsState()
 
+    val listState = rememberLazyListState()
 
     LaunchedEffect(key1 = true) {
         messagingViewModel.setChatRoomUID(chatRoomUID = chatRoomUid)
+        listState.scrollToItem(index = 0)
     }
 
     DisposableEffect(true) {
@@ -79,6 +82,7 @@ fun SingleChatRoom(
                 )
             }
             LazyColumn(
+                state = listState,
                 reverseLayout = true,
                 modifier = Modifier
                     .weight(1.0f)
