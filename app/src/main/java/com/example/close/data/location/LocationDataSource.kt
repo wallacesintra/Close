@@ -115,48 +115,6 @@ class LocationDataSource(
            awaitClose { listener.remove() }
     }
 
-//    override suspend fun getFriendsLocationNotFlow(userUID: String): List<FriendLocationDetail> = withContext(Dispatchers.IO) {
-//        suspendCancellableCoroutine { continuation ->
-//            firestoreDB.collection(closeFriendsLocation).document(userUID)
-//                .get()
-//                .addOnSuccessListener { locations ->
-//
-//                    val container = locations.toObject<FriendsLocation>()
-//
-//                    if (container != null) {
-//                        continuation.resume(container.friendsLocationList)
-//                    }
-//                }
-//                .addOnFailureListener { e ->
-//                    Log.w("Location Sharing", "get locations failed " + e.message)
-//                    continuation.resume(emptyList())
-//                }
-//
-//        }
-//    }
-
-//    override suspend fun getFriendsLocationNotFlow(userUID: String): List<FriendLocationDetail> = withContext(Dispatchers.IO) {
-//        suspendCancellableCoroutine { continuation ->
-//            firestoreDB.collection(closeFriendsLocation).document(userUID)
-//                .get()
-//                .addOnSuccessListener { documentSnapshot ->
-//                    if (documentSnapshot.exists()) {
-//                        val container = documentSnapshot.toObject(FriendsLocation::class.java)
-//                        container?.let {
-//                            continuation.resume(it.friendsLocationList)
-//                        } ?: continuation.resume(emptyList())
-//                    } else {
-//                        Log.w("Location Sharing", "No document found for userUID: $userUID")
-//                        continuation.resume(emptyList())
-//                    }
-//                }
-//                .addOnFailureListener { e ->
-//                    Log.w("Location Sharing", "get locations failed: ${e.message}")
-//                    continuation.resume(emptyList())
-//                }
-//        }
-//    }
-
     override suspend fun getFriendsLocationNotFlow(userUID: String): List<FriendLocationDetail> = withContext(Dispatchers.IO) {
         suspendCancellableCoroutine { continuation ->
             if (userUID.isBlank()) {
@@ -242,61 +200,6 @@ class LocationDataSource(
         val documentSnapshot = firestoreDB.collection(closeFriendsLocation).document(userUID).get().await()
         return documentSnapshot.exists()
     }
-
-//    override suspend fun getLocationByUserUID(userUID: String): LocationModel = withContext(Dispatchers.IO){
-//        suspendCancellableCoroutine<LocationModel> { continuation ->
-//            if (userUID.isBlank()){
-//                Log.w("Location Listening", "invalid user uid : $userUID")
-////                continuation.resume(LocationModel())
-//                return@suspendCancellableCoroutine
-//            }
-//
-//            firestoreDB.collection(closeLocationCollection).document(userUID)
-//                .addSnapshotListener { snapshot, error ->
-//                    if (error != null ){
-//                        Log.w("Location Listening", "listening failed with $error")
-//                        return@addSnapshotListener
-//                    }
-//                    val locationDetail = snapshot?.toObject<LocationModel>()
-//                    Log.d("Location Listening", "listening successful")
-//
-//                    continuation.resume(locationDetail!!)
-//
-////                    if (snapshot != null && snapshot.exists()){
-////
-////                    }
-////                    else {
-////                        Log.d("Location Listening", "empty")
-////                        continuation.resume(LocationModel())
-////                    }
-//                }
-//        }
-//    }
-
-//    override suspend fun getLocationByUserUID(userUID: String): LocationDetail {
-//        val deferred = CompletableDeferred<LocationDetail>()
-//
-//        firestoreDB.collection(closeLocationCollection).document("Cuo4cDX5UCRXs4J4zOaIJ6PLP0d2")
-//            .get()
-//
-//            .addOnSuccessListener { detail ->
-//                val location = detail.toObject<LocationDetail>()
-//
-//                if (location != null){
-//                    Log.d("User current location now", "$location")
-//                    deferred.complete(location)
-//                }
-//            }
-//            .addOnFailureListener {error ->
-//                Log.w("User current location now", "$error")
-//                deferred.completeExceptionally(error)
-//            }
-//
-//
-//        return withContext(Dispatchers.IO){
-//            deferred.await()
-//        }
-//    }
 
     override suspend fun getLocationByUserUID(userUID: String): LocationDetail {
         if (userUID.isBlank()) {

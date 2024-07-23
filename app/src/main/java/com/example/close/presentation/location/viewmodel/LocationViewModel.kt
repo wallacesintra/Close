@@ -37,17 +37,15 @@ class LocationViewModel(
     private val closeUserDataSource: CloseUserDataSource,
 ): ViewModel() {
 
-    init {
-        viewModelScope.launch {
-//            getCurrentLocation()
-
-            val location = locationDataSource.getLocationByUserUIDFlow("Cuo4cDX5UCRXs4J4zOaIJ6PLP0d2")
-            location.collect{value ->
-                println(value)
-                Log.d("location test viewmodel", value.locationDetail.latitude.toString())
-            }
-        }
-    }
+//    init {
+//        viewModelScope.launch {
+//            val location = locationDataSource.getLocationByUserUIDFlow("Cuo4cDX5UCRXs4J4zOaIJ6PLP0d2")
+//            location.collect{value ->
+//                println(value)
+//                Log.d("location test viewmodel", value.locationDetail.latitude.toString())
+//            }
+//        }
+//    }
 
 
     var locationState: LocationState by mutableStateOf(LocationState.Loading)
@@ -57,7 +55,6 @@ class LocationViewModel(
 
     var sharingState: SharingState by mutableStateOf(SharingState.Success(friendsLocationList = emptyList()))
 
-//    private val _friendsLocation = locationDataSource.getFriendsLocation(userUID = )
 
 
     fun createLocationContainer(userUID: String){
@@ -121,6 +118,15 @@ class LocationViewModel(
         }
     }
 
+    /**
+     * @param lat1 first location latitude
+     * @param lon1 first location longitude
+     * @param lat2 second location latitude
+     * @param lon2 second location longitude
+     *
+     * @return string of the distance between the two locations
+     * **/
+
 
     private fun calculateDistance(lat1: Double, lon1: Double, lat2: Double, lon2: Double): String {
         val earthRadius = 6371 // Radius of the earth in kilometers
@@ -180,7 +186,6 @@ class LocationViewModel(
 
 
                     Log.d("Getting Location detail", "location from $locationDetail")
-//                    Log.d("Getting Location detail", "$distance km away from ")
                     Log.d("Getting Location detail", "location from $user")
 
 
@@ -188,11 +193,8 @@ class LocationViewModel(
                         FriendLocation(
                             closerUser = closeUserDataSource.getCloseUserByUid(closeUid = friendUID),
                             locationCoordinates = locationDataSource.getLocationByUserUID(userUID = friendUID),
-//                            locationCoordinates = locationDetail,
                             distanceBetweenCurrentUserLocation = distance
-                    )
-
-
+                        )
                     )
                 }
 
