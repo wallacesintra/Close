@@ -12,6 +12,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 
 class CloseUserDataSource(
     private val firestoreDb: FirebaseFirestore
@@ -39,29 +40,39 @@ class CloseUserDataSource(
         }
     }
 
-    override suspend fun getSignedInUser(uid: String): CloseUserData {
-        val deferred = CompletableDeferred<CloseUserData>()
+    override suspend fun getSignedInUser(uid: String): CloseUserData =
+        withContext(Dispatchers.IO){
+            suspendCancellableCoroutine<CloseUserData> { continuation ->
+                var hasResumed = false
 
-        firestoreDb.collection("closeUsers").document(uid)
-            .get()
-            .addOnSuccessListener { user ->
-                val userData = user.toObject<CloseUserData>()
-                Log.d("firestore:get user: successful", "user uid: " + userData?.email)
+                val listenerRegistration = firestoreDb.collection("closeUsers").document(uid)
+                    .addSnapshotListener { value, error ->
 
-                if (userData != null){
-                    deferred.complete(userData)
+                        if (error != null){
+                            if (!hasResumed){
+                                continuation.resumeWithException(error)
+                                hasResumed = true
+                            }
+
+                            return@addSnapshotListener
+                        }
+
+                        if (!hasResumed) {
+                            val userData = value?.toObject<CloseUserData>()
+
+                            if (userData != null){
+                                Log.d("firestore:get user: successful", "user uid: " + userData.email)
+                                continuation.resume(userData)
+                            }
+                            hasResumed = true
+                        }
+                    }
+
+                continuation.invokeOnCancellation {
+                    listenerRegistration.remove()
                 }
-
             }
-            .addOnFailureListener {e ->
-                Log.w("firestore:get user: failure", e.message.toString())
-                deferred.completeExceptionally(e)
-            }
-
-        return withContext(Dispatchers.IO){
-            deferred.await()
         }
-    }
 
     override suspend fun updateDetail(detailToUpdate: String, userUid: String, newValue: String) {
 

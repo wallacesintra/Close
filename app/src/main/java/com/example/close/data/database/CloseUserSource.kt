@@ -1,13 +1,15 @@
 package com.example.close.data.database
 
 import com.example.close.data.database.models.CloseUser
-import com.example.close.data.database.models.FriendRequest
 import com.example.close.data.database.models.CloseUserData
+import com.example.close.data.database.models.FriendRequest
 
 interface CloseUserSource {
     suspend fun addNewCloseUser(newUser: CloseUserData)
 
     suspend fun getSignedInUser(uid: String): CloseUserData
+
+//    suspend fun getSignedInUserFlow(uid: String): CloseUserData
 
     suspend fun updateDetail(detailToUpdate: String,userUid: String, newValue: String)
 

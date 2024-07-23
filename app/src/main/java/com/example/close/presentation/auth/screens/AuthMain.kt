@@ -1,15 +1,17 @@
 package com.example.close.presentation.auth.screens
 
-import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -34,17 +36,17 @@ fun AuthMain(
         modifier = modifier
             .fillMaxSize()
     ) {
-//        Text(text = stringResource(id = R.string.app_name))
-        Image(
-            painter = painterResource(id = R.drawable.home),
-            contentDescription = "home screen",
-//            colorFilter = MaterialTheme.colorScheme.primary
-//            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary)
+        Box(
             modifier = Modifier
-                .size(300.dp)
-//                .padding(100.dp)
-                .clip(RoundedCornerShape(150.dp))
-        )
+                .clip(RoundedCornerShape(120.dp))
+                .background(MaterialTheme.colorScheme.primary)
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.close_app_icon),
+                contentDescription = "app icon",
+                tint = MaterialTheme.colorScheme.background
+            )
+        }
         
         Button(
             onClick = signInEvent,
