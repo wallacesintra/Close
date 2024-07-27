@@ -129,7 +129,7 @@ fun SingleChatRoom(
                         },
                         colors = IconButtonDefaults.iconButtonColors(
                             contentColor = MaterialTheme.colorScheme.onPrimary,
-                            containerColor = MaterialTheme.colorScheme.primary
+                            containerColor = MaterialTheme.colorScheme.secondary
                         ),
                     ) {
                         Icon(

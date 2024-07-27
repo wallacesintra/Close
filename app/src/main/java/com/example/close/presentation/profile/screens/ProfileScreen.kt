@@ -13,7 +13,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.close.R
-import com.example.close.data.database.models.CloseUserData
+import com.example.close.data.users.models.CloseUserData
 import com.example.close.presentation.components.LargeActionContainer
 import com.example.close.presentation.components.LargeText
 import com.example.close.presentation.components.MediumText

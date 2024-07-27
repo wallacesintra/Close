@@ -12,7 +12,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.example.close.data.database.models.CloseUserData
+import com.example.close.data.users.models.CloseUserData
 import com.example.close.data.location.model.LocationModel
 import com.example.close.presentation.components.Loading
 import com.example.close.presentation.location.components.FriendsLocationListComponents

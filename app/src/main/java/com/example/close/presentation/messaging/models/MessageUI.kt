@@ -1,6 +1,6 @@
 package com.example.close.presentation.messaging.models
 
-import com.example.close.data.database.models.CloseUser
+import com.example.close.data.users.models.CloseUser
 import com.google.errorprone.annotations.Immutable
 
 @Immutable

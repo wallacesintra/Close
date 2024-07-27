@@ -1,6 +1,6 @@
 package com.example.close.presentation.friends.models
 
-import com.example.close.data.database.models.CloseUser
+import com.example.close.data.users.models.CloseUser
 
 data class CloseFriendRequest(
     val requestUid: String = "",

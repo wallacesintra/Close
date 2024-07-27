@@ -17,7 +17,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.close.R
-import com.example.close.data.database.models.CloseUser
+import com.example.close.data.users.models.CloseUser
 import com.example.close.presentation.components.LargeText
 import com.example.close.presentation.components.Loading
 import com.example.close.presentation.components.MediumFriendProfileContainer
@@ -34,7 +34,7 @@ fun FriendsList(
 
         MediumText(
             text = if (friendsList.size > 1 || friendsList.isEmpty()) "${friendsList.size} friends" else "${friendsList.size} friend",
-            modifier = Modifier.padding(vertical =  10.dp),
+            modifier = Modifier.padding(10.dp),
             isBold = true
         )
 

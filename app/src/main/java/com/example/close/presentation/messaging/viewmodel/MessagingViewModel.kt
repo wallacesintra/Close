@@ -14,9 +14,9 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.close.CloseApp
-import com.example.close.data.database.CloseUserDataSource
-import com.example.close.data.database.models.CloseUser
 import com.example.close.data.messaging.CloseMessagingDataSource
+import com.example.close.data.users.CloseUserDataSource
+import com.example.close.data.users.models.CloseUser
 import com.example.close.presentation.messaging.models.ChatRoomsState
 import com.example.close.presentation.messaging.models.CloseChatRoomUI
 import com.example.close.presentation.messaging.models.MessageListUI

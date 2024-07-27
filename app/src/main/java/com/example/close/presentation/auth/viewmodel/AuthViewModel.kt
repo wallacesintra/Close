@@ -13,9 +13,9 @@ import com.example.close.CloseApp
 import com.example.close.data.auth.Resource
 import com.example.close.data.auth.UserDataSource
 import com.example.close.data.cometChat.CometChatAuthImp
-import com.example.close.data.database.CloseUserDataSource
-import com.example.close.data.database.models.CloseUserData
 import com.example.close.data.location.LocationDataSource
+import com.example.close.data.users.CloseUserDataSource
+import com.example.close.data.users.models.CloseUserData
 import com.example.close.presentation.auth.models.AuthState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -44,17 +44,17 @@ class AuthViewModel(
                 is Resource.Success -> {
                     val uid = user.data!!.uid
 
-                    val currentUser= closeUserDataSource.getSignedInUser(uid)
-
-                    userData = userData.copy(
-                        uid = currentUser.uid,
-                        email = currentUser.email,
-                        username = currentUser.username,
-                        bio = currentUser.bio,
-                        profileImg = currentUser.profileImg,
-                        friends = currentUser.friends,
-                        shareLocation = currentUser.shareLocation
-                    )
+                    closeUserDataSource.getSignedInUserFlow(uid = uid).collect{ closeUserData ->
+                        userData = userData.copy(
+                            uid = closeUserData.uid,
+                            username = closeUserData.username,
+                            email = closeUserData.email,
+                            bio = closeUserData.bio,
+                            profileImg = closeUserData.profileImg,
+                            friends = closeUserData.friends,
+                            shareLocation = closeUserData.shareLocation
+                        )
+                    }
                 }
             }
         }
@@ -124,13 +124,13 @@ class AuthViewModel(
 
                     val uid = userDetails.data!!.uid
 
-                    val signedInUser =closeUserDataSource.getSignedInUser(uid)
-
-                    userData = userData.copy(
-                        uid = signedInUser.uid,
-                        username = signedInUser.username,
-                        email = signedInUser.email
-                    )
+                    closeUserDataSource.getSignedInUserFlow(uid = uid).collect{ userdetails ->
+                        userData = userData.copy(
+                            uid = userdetails.uid,
+                            username = userdetails.username,
+                            email = userdetails.email
+                        )
+                    }
 
                     authState = authState.copy(
                         isUserSignedIn = true

@@ -8,7 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.close.data.database.models.CloseUserData
+import com.example.close.data.users.models.CloseUserData
 import com.example.close.presentation.location.models.FriendLocation
 import com.example.close.presentation.location.models.LocationDetails
 import com.example.close.presentation.models.profileImagesMap

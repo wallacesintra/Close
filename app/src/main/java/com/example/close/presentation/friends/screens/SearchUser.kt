@@ -81,13 +81,16 @@ fun SearchUser(
                 MediumText(text = stringResource(id = R.string.no_user_found), modifier = Modifier.padding(10.dp))
             }
 
-            LazyColumn {
+            LazyColumn(
+                modifier = Modifier.padding(horizontal = 10.dp)
+            ) {
                 items(closeUsers) { user ->
                     MediumFriendProfileContainer(
                         userUid = user.uid,
                         username = user.username,
                         imgResId = profileImagesMap[user.profileImg]!!.imgResId,
-                        goToFriendProfile = goToFriendProfile
+                        goToFriendProfile = goToFriendProfile,
+
                     )
                 }
             }

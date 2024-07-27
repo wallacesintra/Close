@@ -1,6 +1,4 @@
-package com.example.close.data.database.models
-
-import com.google.firebase.firestore.FieldValue
+package com.example.close.data.users.models
 
 data class FriendRequest(
     val requestUid: String = "",

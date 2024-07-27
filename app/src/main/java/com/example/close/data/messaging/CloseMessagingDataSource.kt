@@ -125,6 +125,9 @@ class CloseMessagingDataSource(
 
                     trySend(textMessages.messages)
                 }
-        awaitClose { listener.remove() } // Detach the listener when the flow collector is done
+
+        awaitClose { listener.remove() }
     }
+
+
 }

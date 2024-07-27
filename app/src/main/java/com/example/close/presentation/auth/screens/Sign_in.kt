@@ -91,7 +91,7 @@ fun SignIn(
                 text = stringResource(id = R.string.sign_in_welcome),
                 fontSize = 30.sp,
                 fontWeight = FontWeight.W700,
-                color = MaterialTheme.colorScheme.primary
+                color = MaterialTheme.colorScheme.secondary
             )
             Text(
                 text = stringResource(id = R.string.sign_in_account),
@@ -209,7 +209,7 @@ fun SignIn(
                         text = stringResource(id = R.string.sign_up),
                         textDecoration = TextDecoration.Underline,
                         fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.primary,
+                        color = MaterialTheme.colorScheme.tertiary,
                         modifier = Modifier.clickable(
                             onClick = goToSignUp
                         )

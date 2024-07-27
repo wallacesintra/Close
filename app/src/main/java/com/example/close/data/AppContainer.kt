@@ -3,7 +3,7 @@ package com.example.close.data
 import android.content.Context
 import com.example.close.data.auth.UserDataSource
 import com.example.close.data.cometChat.CometChatAuthImp
-import com.example.close.data.database.CloseUserDataSource
+import com.example.close.data.users.CloseUserDataSource
 import com.example.close.data.location.LocationDataSource
 import com.example.close.data.messaging.CloseMessagingDataSource
 import com.google.android.gms.location.FusedLocationProviderClient

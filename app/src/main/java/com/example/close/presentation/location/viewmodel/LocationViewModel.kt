@@ -13,7 +13,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.close.CloseApp
-import com.example.close.data.database.CloseUserDataSource
+import com.example.close.data.users.CloseUserDataSource
 import com.example.close.data.location.LocationDataSource
 import com.example.close.data.location.model.LocationModel
 import com.example.close.presentation.location.models.FriendLocation

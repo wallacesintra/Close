@@ -11,7 +11,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.close.CloseApp
-import com.example.close.data.database.CloseUserDataSource
+import com.example.close.data.users.CloseUserDataSource
 import com.example.close.presentation.profile.models.DetailsState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
