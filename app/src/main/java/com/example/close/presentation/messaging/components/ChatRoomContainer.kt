@@ -59,6 +59,7 @@ fun ChatRoomContainer(
                 MediumText(
                     text = closeChatRoomUi.members.joinToString(separator = ", ") { member -> member.username },
                     isBold = true,
+                    color = MaterialTheme.colorScheme.tertiary
                 )
                 MediumText(
                     text = if (closeChatRoomUi.messages.isEmpty()) "start a conversation" else closeChatRoomUi.messages.last().message ,

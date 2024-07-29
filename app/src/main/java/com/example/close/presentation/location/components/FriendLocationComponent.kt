@@ -28,7 +28,7 @@ fun FriendLocationComponent(
     Card(
         onClick = { onFriendComponentClick(location) },
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.9f)
+            containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.9f)
         ),
         modifier = Modifier.padding(2.dp),
         shape = RoundedCornerShape(38.dp)

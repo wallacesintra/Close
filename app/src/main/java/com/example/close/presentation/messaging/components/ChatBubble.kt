@@ -53,7 +53,6 @@ fun ChatBubble(
                 Text(
                     text = messageUI.message,
                     color = if (messageUI.sender.uid == currentUserUid) MaterialTheme.colorScheme.background else MaterialTheme.colorScheme.onBackground,
-
                     )
             }
         }

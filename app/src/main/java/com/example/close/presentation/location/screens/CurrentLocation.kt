@@ -9,11 +9,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.example.close.data.users.models.CloseUserData
 import com.example.close.data.location.model.LocationModel
+import com.example.close.data.users.models.CloseUserData
 import com.example.close.presentation.components.Loading
 import com.example.close.presentation.location.components.FriendsLocationListComponents
 import com.example.close.presentation.location.components.MapView
@@ -84,18 +85,22 @@ fun CurrentLocation(
                             cameraPositionState = cameraPositionState
                         )
 
-                        FriendsLocationListComponents(
-                            friendsList = sharingState.friendsLocationList,
-                            onFriendComponentClick = { friendLocation ->
-                                cameraPositionState = CameraPositionState(
-                                    position = CameraPosition.fromLatLngZoom(
-                                        friendLocation,
-                                        19f
+                        Box(
+                            modifier = Modifier.align(Alignment.TopCenter)
+                        ) {
+                            FriendsLocationListComponents(
+                                friendsList = sharingState.friendsLocationList,
+                                onFriendComponentClick = { friendLocation ->
+                                    cameraPositionState = CameraPositionState(
+                                        position = CameraPosition.fromLatLngZoom(
+                                            friendLocation,
+                                            19f
+                                        )
                                     )
-                                )
-                            },
-                            modifier = Modifier.padding(vertical = 8.dp)
-                        )
+                                },
+                                modifier = Modifier.padding(vertical = 8.dp)
+                            )
+                        }
 
                     }
                 }

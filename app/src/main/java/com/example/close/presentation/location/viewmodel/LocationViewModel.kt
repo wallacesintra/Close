@@ -13,13 +13,14 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.close.CloseApp
-import com.example.close.data.users.CloseUserDataSource
 import com.example.close.data.location.LocationDataSource
 import com.example.close.data.location.model.LocationModel
+import com.example.close.data.users.CloseUserDataSource
 import com.example.close.presentation.location.models.FriendLocation
 import com.example.close.presentation.location.models.LocationDetails
 import com.example.close.presentation.location.models.LocationState
 import com.example.close.presentation.location.models.SharingState
+import com.example.close.utils.CryptoManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -37,15 +38,7 @@ class LocationViewModel(
     private val closeUserDataSource: CloseUserDataSource,
 ): ViewModel() {
 
-//    init {
-//        viewModelScope.launch {
-//            val location = locationDataSource.getLocationByUserUIDFlow("Cuo4cDX5UCRXs4J4zOaIJ6PLP0d2")
-//            location.collect{value ->
-//                println(value)
-//                Log.d("location test viewmodel", value.locationDetail.latitude.toString())
-//            }
-//        }
-//    }
+    private val cryptoManager = CryptoManager()
 
 
     var locationState: LocationState by mutableStateOf(LocationState.Loading)
@@ -55,15 +48,6 @@ class LocationViewModel(
 
     var sharingState: SharingState by mutableStateOf(SharingState.Success(friendsLocationList = emptyList()))
 
-
-
-    fun createLocationContainer(userUID: String){
-        viewModelScope.launch(Dispatchers.IO) {
-            if(!locationDataSource.checkIfLocationContainerContainer(userUID = userUID)){
-                locationDataSource.createLocationContainer(userUID = userUID)
-            }
-        }
-    }
 
     fun getCurrentLocation(){
         viewModelScope.launch(Dispatchers.IO) {
@@ -111,10 +95,41 @@ class LocationViewModel(
         viewModelScope.launch(Dispatchers.IO){
             delay(500)
 
+            Log.d("encrypt data", "real data : ${locationDetail.latitude}")
+            val (encryptedLatitude, lat_iv) = cryptoManager.encryptDouble(locationDetail.latitude)
+
+            Log.d("iv latitude", lat_iv)
+            val (encryptedLongitude, long_iv) = cryptoManager.encryptDouble(locationDetail.longitude)
+
+            val latitudePairing = Pair(encryptedLatitude, lat_iv)
+            val longitudePairing = Pair(encryptedLongitude, long_iv)
+
+//            Log.d("encrypt data", "decrypted data: $encryptedLatitude$iv")
+            Log.d("encrypt data", "decrypted data: $latitudePairing")
+
+//            Log.d("encrypt data", "encrypted data: ${cryptoManager.decryptDouble(encryptedLatitude, iv)}")
+            Log.d("encrypt data", "encrypted data: ${cryptoManager.decryptDouble(latitudePairing.first, latitudePairing.second)}")
+
+
             locationDataSource.setLocationDetail(
                 userUID = userUID,
                 locationDetail = locationDetail
             )
+
+//            val newLocationEncrypted = LocationModelEncrypted(
+//                latitude = encryptedLatitude,
+//                latitudeIv = lat_iv,
+//                longitude = encryptedLongitude,
+//                longitudeIv = long_iv
+////                latitude = latitudePairing,
+////                longitude = longitudePairing
+//            )
+
+
+//            locationDataSource.setLocationDetailEncrypted(
+//                userUID = userUID,
+//                locationDetail =newLocationEncrypted
+//            )
         }
     }
 
@@ -165,7 +180,6 @@ class LocationViewModel(
      * @param friendsLIst friend uid list
      */
     fun getFriendsLocationDetails(friendsLIst: List<String>) {
-//        Log.d("LocationSharing", "Attempting to receive locations for user $userUID")
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val currentUserLocation = locationDataSource.fetchCurrentLocation().first()
@@ -176,23 +190,52 @@ class LocationViewModel(
 
                 friendsLIst.forEach { friendUID ->
                     val locationDetail = locationDataSource.getLocationByUserUID(userUID = friendUID)
-                    val user = closeUserDataSource.getCloseUserByUid(closeUid = friendUID)
+//                    val locationDetail = locationDataSource.getEncryptedLocationByUser(userUID = friendUID)
+
+//                    lateinit var locationInfo: LocationDetail
+
+//                    val locationInfo = LocationDetail(
+//                        locationDetail = LocationModel(
+//                            latitude = cryptoManager.decryptDouble(locationDetail.locationDetail!!.latitude, locationDetail.locationDetail.latitudeIv),
+//                            longitude = cryptoManager.decryptDouble(locationDetail.locationDetail.longitude, locationDetail.locationDetail.longitudeIv)
+//                        )
+//                    )
+//                     locationDataSource.getEncryptedLocationOfUserUIDFlow(userUID = friendUID).collect { encryptedLocation ->
+//
+//                         Log.d("encrypted location flow", encryptedLocation.locationDetail!!.latitude)
+//                        locationInfo = LocationDetail(
+////                            lat = cryptoManager.decryptDouble(encryptedLocation.locationDetail.latitude!!.first, encryptedLocation.locationDetail.latitude.second),
+////                            long = cryptoManager.decryptDouble(encryptedLocation.locationDetail.longitude!!.first, encryptedLocation.locationDetail.longitude.second)
+//                            locationDetail = LocationModel(
+//                                latitude = cryptoManager.decryptDouble(encryptedLocation.locationDetail!!.latitude, encryptedLocation.locationDetail.latitudeIv),
+////                                latitude = cryptoManager.decryptDouble(encryptedLocation.locationDetail!!.latitude.first, encryptedLocation.locationDetail.latitude.second),
+//                                longitude = cryptoManager.decryptDouble(encryptedLocation.locationDetail.longitude, encryptedLocation.locationDetail.longitudeIv)
+////                                longitude = cryptoManager.decryptDouble(encryptedLocation.locationDetail.longitude.first, encryptedLocation.locationDetail.longitude.second)
+//                            )
+//                        )
+//                    }
+
+
+//                    val user = closeUserDataSource.getCloseUserByUid(closeUid = friendUID)
                     val distance = calculateDistance(
                         lat1 = currentUserLocation.latitude,
                         lon1 = currentUserLocation.longitude,
+//                        lat2 = locationInfo.locationDetail.latitude,
+//                        lon2 = locationInfo.locationDetail.longitude
                         lat2 = locationDetail.locationDetail.latitude,
                         lon2 = locationDetail.locationDetail.longitude
                     )
 
 
                     Log.d("Getting Location detail", "location from $locationDetail")
-                    Log.d("Getting Location detail", "location from $user")
+//                    Log.d("Getting Location detail", "location from ${locationInfo.locationDetail}")
 
 
                     friendsLocationList.add(
                         FriendLocation(
                             closerUser = closeUserDataSource.getCloseUserByUid(closeUid = friendUID),
                             locationCoordinates = locationDataSource.getLocationByUserUID(userUID = friendUID),
+//                            locationCoordinates = locationInfo,
                             distanceBetweenCurrentUserLocation = distance
                         )
                     )

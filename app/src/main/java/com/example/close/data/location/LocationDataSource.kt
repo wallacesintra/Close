@@ -9,7 +9,9 @@ import androidx.core.app.ActivityCompat
 import com.example.close.data.location.model.FriendLocationDetail
 import com.example.close.data.location.model.FriendsLocation
 import com.example.close.data.location.model.LocationDetail
+import com.example.close.data.location.model.LocationDetailEncrypted
 import com.example.close.data.location.model.LocationModel
+import com.example.close.data.location.model.LocationModelEncrypted
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationResult
@@ -38,6 +40,7 @@ class LocationDataSource(
     private val closeFriendsLocation = "CloseFriendsCoordinates"
 
     private val closeLocationCollection = "CloseLocationCollection"
+
 
     override suspend fun fetchCurrentLocation(): Flow<LocationModel> {
         return callbackFlow {
@@ -270,6 +273,42 @@ class LocationDataSource(
         }
     }
 
+    override suspend fun setLocationDetailEncrypted(
+        userUID: String,
+        locationDetail: LocationModelEncrypted
+    ) {
+        if (userUID.isBlank()){
+            return
+        }
+        val deferred = CompletableDeferred<Unit>()
+
+        val newLocation = hashMapOf(
+//            "timeStamp" to FieldValue.serverTimestamp(),
+//            "locationDetail" to locationDetail
+            "locationDetail" to mapOf(
+                "latitude" to locationDetail.latitude,
+                "latitudeIv" to locationDetail.latitudeIv,
+                "longitude" to locationDetail.longitude,
+                "longitudeIv" to locationDetail.longitudeIv
+            )
+        )
+
+        firestoreDB.collection(closeLocationCollection).document(userUID)
+            .set(newLocation)
+            .addOnFailureListener { e->
+                Log.w("setting encrypted location", "setting location failed with $e")
+                deferred.completeExceptionally(e)
+            }
+            .addOnSuccessListener {
+                Log.d("setting encrypted location", "setting location successful")
+                deferred.complete(Unit)
+            }
+
+        withContext(Dispatchers.IO){
+            deferred.await()
+        }
+    }
+
     override suspend fun createLocationDocument(userUID: String) {
 
         val deferred = CompletableDeferred<Unit>()
@@ -308,6 +347,60 @@ class LocationDataSource(
                 }
 
             awaitClose { listener.remove() }
+    }
 
+    override suspend fun getEncryptedLocationByUser(userUID: String): LocationDetailEncrypted {
+        if (userUID.isBlank()){
+            throw IllegalArgumentException("User ID cannot be blank")
+        }
+
+        val deferred = CompletableDeferred<LocationDetailEncrypted>()
+        firestoreDB.collection(closeLocationCollection).document(userUID)
+            .get()
+            .addOnFailureListener {e->
+                deferred.completeExceptionally(e)
+            }
+            .addOnSuccessListener { documentSnapshot ->
+                if (documentSnapshot.exists()){
+                    val location = documentSnapshot.toObject<LocationDetailEncrypted>()
+
+                    if (location != null){
+                        deferred.complete(location)
+                    }else {
+                        deferred.completeExceptionally(
+                            KotlinNullPointerException("location is null")
+                        )
+                    }
+                }else{
+                    deferred.completeExceptionally(
+                        NoSuchElementException("Document does not exist")
+                    )
+                }
+            }
+
+        return withContext(Dispatchers.IO){
+            deferred.await()
+        }
+    }
+
+    override suspend fun getEncryptedLocationOfUserUIDFlow(userUID: String): Flow<LocationDetailEncrypted> =
+        callbackFlow{
+            val listener = firestoreDB.collection(closeLocationCollection)
+
+                .document(userUID)
+
+                .addSnapshotListener { value, error ->
+                    if (error != null){
+                        close()
+                        Log.w("getting encrypted location", "failed $error")
+                        return@addSnapshotListener
+                    }
+
+                    val locationDetail = value?.toObject<LocationDetailEncrypted>()
+                    Log.d("getting encrypted location", "successful")
+                    trySend(locationDetail!!)
+                }
+
+            awaitClose { listener.remove() }
     }
 }
