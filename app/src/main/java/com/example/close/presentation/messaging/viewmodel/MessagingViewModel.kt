@@ -1,7 +1,5 @@
 package com.example.close.presentation.messaging.viewmodel
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -99,11 +97,17 @@ class MessagingViewModel(
         _messageText.value = text
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
+//    @RequiresApi(Build.VERSION_CODES.O)
     fun sendMessage(roomUid: String, senderUid: String, textMessage:String){
         viewModelScope.launch(Dispatchers.IO) {
             closeMessagingDataSource.sendMessage(roomUid, senderUid, textMessage)
             _messageText.value = ""
+        }
+    }
+
+    fun deleteMessage(roomUid: String, message: MessageUI){
+        viewModelScope.launch(Dispatchers.IO) {
+            closeMessagingDataSource.deleteMessage(roomUid = roomUid, message = message)
         }
     }
 

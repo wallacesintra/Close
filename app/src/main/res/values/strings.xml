@@ -50,8 +50,10 @@
     <string name="message">Message</string>
     <string name="messages">Messages</string>
     <string name="send_message">Send the message</string>
-    
     <string name="say_hi">Say Hey</string>
+    <string name="share_or_delete_message">Long press to share or delete message</string>
+    <string name="share_message">Share message</string>
+    <string name="delete_message">Delete message</string>
 
     <string name="turn_on_location">Turn on Location</string>
 

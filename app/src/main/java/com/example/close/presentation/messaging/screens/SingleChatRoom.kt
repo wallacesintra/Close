@@ -92,7 +92,13 @@ fun SingleChatRoom(
                     items = showMessageList.messageList,
                     key = { message -> message.messageUid }
                 ){ message ->
-                    ChatBubble(currentUserUid = currentUserUid, messageUI = message)
+                    ChatBubble(
+                        currentUserUid = currentUserUid,
+                        messageUI = message,
+                        deleteMessage = {
+                            messagingViewModel.deleteMessage(roomUid = chatRoomUid, message = message)
+                        }
+                    )
                 }
             }
             
@@ -141,8 +147,8 @@ fun SingleChatRoom(
                     }
                 },
                 modifier = Modifier
-                    .padding(10.dp)
-                    .fillMaxWidth(0.99f)
+                    .padding(vertical=10.dp)
+                    .fillMaxWidth(1.00f)
             )
 
         }
