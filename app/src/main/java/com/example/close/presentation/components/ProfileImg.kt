@@ -31,8 +31,8 @@ fun ProfileImg(
             .size(imgSize)
             .clip(CircleShape)
             .border(
-                width = 1.dp,
-                color = MaterialTheme.colorScheme.secondary,
+                width = 2.dp,
+                color = MaterialTheme.colorScheme.tertiary,
                 shape = CircleShape
             )
     )

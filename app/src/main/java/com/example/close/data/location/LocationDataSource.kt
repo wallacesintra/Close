@@ -202,7 +202,7 @@ class LocationDataSource(
         }
         val documentSnapshot = firestoreDB.collection(closeFriendsLocation).document(userUID).get().await()
         return documentSnapshot.exists()
-    }
+    } 
 
     override suspend fun getLocationByUserUID(userUID: String): LocationDetail {
         if (userUID.isBlank()) {

@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.close.presentation.components.LargeText
+import com.example.close.presentation.components.Loading
 import com.example.close.presentation.components.MediumText
 import com.example.close.presentation.components.ProfileImg
 import com.example.close.presentation.friends.models.CloseUserState
@@ -25,6 +26,7 @@ import com.example.close.presentation.models.profileImagesMap
 fun FriendProfileScreen(
     friendUid: String,
     currentUserUid: String,
+    friendsUIDList: List<String>,
     sendFriendRequestAction: () -> Unit
 ){
     val closeUserViewModel: CloseUserViewModel = viewModel(factory = CloseUserViewModel.Factory)
@@ -45,22 +47,30 @@ fun FriendProfileScreen(
 
         when(closeUserState){
             is CloseUserState.Error -> { Text(text = closeUserState.error)}
-            CloseUserState.Loading -> { Text(text = "loading......")}
+            CloseUserState.Loading -> { Loading()}
             is CloseUserState.Success -> {
-                profileImagesMap[closeUserState.userDetails.profileImg]?.let {
-                    ProfileImg(
-                        imgSize = 120.dp,
-                        imageResId = it.imgResId,
-                        modifier = Modifier.padding(20.dp)
-                    )
-                }
+                ProfileImg(
+                    imgSize = 120.dp,
+                    imageResId = profileImagesMap[closeUserState.userDetails.profileImg]!!.imgResId,
+                    modifier = Modifier.padding(20.dp)
+                )
                 LargeText(text = closeUserState.userDetails.username)
                 MediumText(text = closeUserState.userDetails.bio)
 
                 Spacer(modifier = Modifier.padding(12.dp))
-                Button(onClick = { sendFriendRequestAction() }) {
-                    Text(text = "send friend request")
+
+                if (closeUserState.userDetails.uid !in friendsUIDList){
+                    Button(onClick = { sendFriendRequestAction() }) {
+                        Text(text = "send friend request")
+                    }
                 }
+
+//                if (closeUserState.userDetails.uid != currentUserUid){
+//                    Button(onClick = { sendFriendRequestAction() }) {
+//                        Text(text = "send friend request")
+//                    }
+//                }
+
             }
         }
     }

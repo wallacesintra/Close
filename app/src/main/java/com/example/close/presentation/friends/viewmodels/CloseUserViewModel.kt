@@ -38,6 +38,7 @@ class CloseUserViewModel(
                             uid = details.uid,
                             username = details.username,
                             bio = details.bio,
+                            profileImg = details.profileImg,
                             sharingLocation = details.sharingLocation
                         )
                     )

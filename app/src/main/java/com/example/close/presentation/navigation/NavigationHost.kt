@@ -64,7 +64,7 @@ fun NavigationHost(
     val currentUser = authViewmodel.userData
     val signInSignUpViewModel: SignInSignUpViewModel = viewModel()
 
-    val authState = authViewmodel.authState
+//    val authState = authViewmodel.authSignState
 
     //Current user Profile details ViewModel
     val currentUserProfileDetailsViewModel: CurrentUserProfileDetailsViewModel = viewModel(factory = CurrentUserProfileDetailsViewModel.Factory)
@@ -192,6 +192,10 @@ fun NavigationHost(
                 SearchUser(
                     searchUserViewModel = searchUserViewModel,
                     currentUserUid = currentUser.uid,
+                    friendsUIDList = currentUser.friends,
+                    sendFriendRequestAction = { friendUID->
+                        friendRequestsViewModel.sendFriendRequest(senderUid = currentUser.uid, receiverUid = friendUID)
+                    },
                     goToFriendProfile = {userUid ->
                         navController.navigate(Screen.FriendProfile.createRoute(userUid))
                     }
@@ -217,6 +221,7 @@ fun NavigationHost(
                     FriendProfileScreen(
                         friendUid = userUid,
                         currentUserUid = currentUser.uid,
+                        friendsUIDList = currentUser.friends,
                         sendFriendRequestAction = {
                             friendRequestsViewModel.sendFriendRequest(senderUid = currentUser.uid, receiverUid = userUid)
                         }
