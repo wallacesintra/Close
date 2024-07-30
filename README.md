@@ -34,3 +34,11 @@ Seeks to enrich social experiences by fostering genuine connection in the digita
     <img src="docs/previews/ChatsListView.png" alt="chats list view" width="270">
     <img src="docs/previews/singleRoomView.png" alt="single chat room" width="270">
 </div>
+
+## Download Close APK
+
+<p>
+<a href="app/build/outputs/apk/debug/app-debug.apk" download="download Close App APK">
+<p>download Close App APK</p>
+</a>
+</p>
