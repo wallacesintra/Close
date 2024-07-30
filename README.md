@@ -37,8 +37,6 @@ Seeks to enrich social experiences by fostering genuine connection in the digita
 
 ## Download Close APK
 
-<p>
-<a href="app/build/outputs/apk/debug/app-debug.apk" download="download Close App APK">
-<p>download Close App APK</p>
+<a href="app/build/outputs/apk/debug/app-debug.apk" download="Close App APK">
+<p> Download Close App APK</p>
 </a>
-</p>
