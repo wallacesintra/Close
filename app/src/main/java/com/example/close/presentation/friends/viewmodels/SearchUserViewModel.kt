@@ -7,8 +7,8 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.close.CloseApp
-import com.example.close.data.database.CloseUserDataSource
-import com.example.close.data.database.models.CloseUser
+import com.example.close.data.users.CloseUserDataSource
+import com.example.close.data.users.models.CloseUser
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow

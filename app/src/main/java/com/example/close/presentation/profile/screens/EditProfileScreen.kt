@@ -10,10 +10,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.close.R
-import com.example.close.data.database.models.CloseUserData
+import com.example.close.data.users.models.CloseUserData
 import com.example.close.presentation.models.profileImagesMap
-import com.example.close.presentation.profile.components.EditProfileImg
 import com.example.close.presentation.profile.components.EditDetail
+import com.example.close.presentation.profile.components.EditProfileImg
 import com.example.close.presentation.profile.viewmodels.CurrentUserProfileDetailsViewModel
 
 @Composable
@@ -30,30 +30,36 @@ fun EditProfileScreen(
             .fillMaxSize()
             .padding(vertical = 10.dp)
     ) {
+
         //edit profile image
-        profileImagesMap[userData.profileImg]?.let {
             EditProfileImg(
-                currentProfileImgRes = it.imgResId,
+                currentProfileImgRes = profileImagesMap[userData.profileImg]!!.imgResId,
                 changeProfileImgEvent = { newProfile ->
-                    currentUserProfileDetailsViewModel.updateCurrentUserDetails(
-                        detailToUpdate = "profileImg",
-                        userUid = userData.uid,
-                        newValue = newProfile
-                    )
+
+                    if (newProfile != userData.profileImg){
+                        currentUserProfileDetailsViewModel.updateCurrentUserDetails(
+                            detailToUpdate = "profileImg",
+                            userUid = userData.uid,
+                            newValue = newProfile
+                        )
+                    }
+
                 }
             )
-        }
 
         //edit username
         EditDetail(
             detailToEdit = "username",
             detailValue = userData.username,
             confirmDetail = {newUsername ->
-                            currentUserProfileDetailsViewModel.updateCurrentUserDetails(
-                                detailToUpdate = "username",
-                                userUid = userData.uid,
-                                newValue = newUsername
-                            )
+                if (newUsername != userData.username){
+                    currentUserProfileDetailsViewModel.updateCurrentUserDetails(
+                        detailToUpdate = "username",
+                        userUid = userData.uid,
+                        newValue = newUsername
+                    )
+                }
+
             },
             painter = painterResource(id = R.drawable.person)
         )
@@ -63,11 +69,17 @@ fun EditProfileScreen(
             detailToEdit = "user bio",
             detailValue = userData.bio,
             confirmDetail = { newBio ->
-                            currentUserProfileDetailsViewModel.updateCurrentUserDetails(
-                                userUid = userData.uid,
-                                detailToUpdate = "bio",
-                                newValue = newBio
-                            )
+
+                if (newBio != userData.bio){
+                    currentUserProfileDetailsViewModel.updateCurrentUserDetails(
+                        userUid = userData.uid,
+                        detailToUpdate = "bio",
+                        newValue = newBio
+                    )
+                }
+
+
+
             },
             detailToEditCharacterCount = 40,
             painter = painterResource(id = R.drawable.info)

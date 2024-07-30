@@ -18,13 +18,13 @@ sealed class Screen(
 
     data object SignUp: Screen("SignUp")
 
-    data object Profile: Screen("Profile", icon = R.drawable.person, screenLabel = "Profile")
+    data object Profile: Screen("Profile", icon = R.drawable.person, screenLabel = "profile")
 
     data object EditProfile: Screen("EditProfile")
 
-    data object Location: Screen("location", icon = R.drawable.map, screenLabel = "Map")
+    data object Location: Screen("location", icon = R.drawable.map, screenLabel = "map")
 
-    data object SearchUser: Screen("SearchUsers", icon = R.drawable.search_person, screenLabel = "Search")
+    data object SearchUser: Screen("SearchUsers", icon = R.drawable.search_person, screenLabel = "search")
 
     data object FriendRequest: Screen("FriendRequest", icon = R.drawable.group, screenLabel = "friends requests")
 
@@ -46,9 +46,9 @@ sealed class Screen(
         fun createRoute(chatRoomUID: String) = "SingleChatRoom/${chatRoomUID}"
     }
 
-    data object Friends: Screen("Friends", icon = R.drawable.group, screenLabel = "Friends")
+    data object Friends: Screen("Friends", icon = R.drawable.group, screenLabel = "friends")
 
-    data object Messages: Screen("Messages", icon = R.drawable.chat, screenLabel = "Chat")
+    data object Messages: Screen("Messages", icon = R.drawable.chat, screenLabel = "chat")
 
 }
 

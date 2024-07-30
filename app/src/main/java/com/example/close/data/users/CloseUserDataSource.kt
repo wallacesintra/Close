@@ -1,18 +1,20 @@
-package com.example.close.data.database
+package com.example.close.data.users
 
 import android.util.Log
-import com.example.close.data.database.models.CloseUser
-import com.example.close.data.database.models.CloseUserData
-import com.example.close.data.database.models.FriendRequest
+import com.example.close.data.users.models.CloseUser
+import com.example.close.data.users.models.CloseUserData
+import com.example.close.data.users.models.FriendRequest
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.toObject
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
 
 class CloseUserDataSource(
     private val firestoreDb: FirebaseFirestore
@@ -40,39 +42,25 @@ class CloseUserDataSource(
         }
     }
 
-    override suspend fun getSignedInUser(uid: String): CloseUserData =
-        withContext(Dispatchers.IO){
-            suspendCancellableCoroutine<CloseUserData> { continuation ->
-                var hasResumed = false
 
-                val listenerRegistration = firestoreDb.collection("closeUsers").document(uid)
-                    .addSnapshotListener { value, error ->
-
-                        if (error != null){
-                            if (!hasResumed){
-                                continuation.resumeWithException(error)
-                                hasResumed = true
-                            }
-
-                            return@addSnapshotListener
-                        }
-
-                        if (!hasResumed) {
-                            val userData = value?.toObject<CloseUserData>()
-
-                            if (userData != null){
-                                Log.d("firestore:get user: successful", "user uid: " + userData.email)
-                                continuation.resume(userData)
-                            }
-                            hasResumed = true
-                        }
+    override suspend fun getSignedInUserFlow(uid: String): Flow<CloseUserData> =
+        callbackFlow {
+            val listener = firestoreDb.collection("closeUsers")
+                .document(uid)
+                .addSnapshotListener { snapshot, error ->
+                    if (error != null){
+                        close()
+                        Log.w("get signed user", error)
+                        return@addSnapshotListener
                     }
 
-                continuation.invokeOnCancellation {
-                    listenerRegistration.remove()
+                    val userData = snapshot?.toObject<CloseUserData>()
+                    Log.d("get signed user", "fetch successful ${userData!!.email}")
+                    trySend(userData)
                 }
-            }
-        }
+            awaitClose {listener.remove()}
+    }
+
 
     override suspend fun updateDetail(detailToUpdate: String, userUid: String, newValue: String) {
 
@@ -239,6 +227,40 @@ class CloseUserDataSource(
                     }
             }
         }
+
+    override suspend fun getFriendRequestsFlow(receiverUid: String): Flow<List<FriendRequest>> =
+    callbackFlow{
+        val listener = firestoreDb.collection(friendRequestCollection)
+            .whereEqualTo("receiverUid", receiverUid)
+            .addSnapshotListener { value, error ->
+
+                if (error != null){
+                    close()
+                    Log.w("receiving friend request", error)
+                    return@addSnapshotListener
+                }
+
+                val requests = mutableListOf<FriendRequest>()
+                Log.d("receiving friend request", "request size: ${value!!.size()}")
+
+                value.forEach { item ->
+                    val request = item.toObject<FriendRequest>()
+                    Log.d("receiving friend request", "request uid: ${request.requestUid}")
+
+
+                    requests.add(
+                        FriendRequest(
+                            requestUid = request.requestUid,
+                            receiverUid = request.receiverUid,
+                            senderUid = request.senderUid ,
+                            accepted = request.accepted,
+                        )
+                    )
+                }
+            }
+
+        awaitClose { listener.remove() }
+    }
 
     override suspend fun acceptFriendRequest(requestUid: String) {
         val deferred = CompletableDeferred<Unit>()

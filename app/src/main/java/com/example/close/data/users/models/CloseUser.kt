@@ -1,4 +1,4 @@
-package com.example.close.data.database.models
+package com.example.close.data.users.models
 
 data class CloseUser(
     val uid: String = "",

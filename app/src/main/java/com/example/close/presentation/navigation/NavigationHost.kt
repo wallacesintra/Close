@@ -1,5 +1,6 @@
 package com.example.close.presentation.navigation
 
+//import com.example.close.presentation.location.viewmodel.SharingLocationViewModel
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
@@ -42,7 +43,6 @@ import com.example.close.presentation.friends.viewmodels.FriendRequestsViewModel
 import com.example.close.presentation.friends.viewmodels.SearchUserViewModel
 import com.example.close.presentation.location.screens.CurrentLocation
 import com.example.close.presentation.location.viewmodel.LocationViewModel
-//import com.example.close.presentation.location.viewmodel.SharingLocationViewModel
 import com.example.close.presentation.messaging.screens.MessageScreen
 import com.example.close.presentation.messaging.screens.SingleChatRoom
 import com.example.close.presentation.messaging.viewmodel.MessagingViewModel
@@ -64,7 +64,7 @@ fun NavigationHost(
     val currentUser = authViewmodel.userData
     val signInSignUpViewModel: SignInSignUpViewModel = viewModel()
 
-    val authState = authViewmodel.authState
+//    val authState = authViewmodel.authSignState
 
     //Current user Profile details ViewModel
     val currentUserProfileDetailsViewModel: CurrentUserProfileDetailsViewModel = viewModel(factory = CurrentUserProfileDetailsViewModel.Factory)
@@ -130,13 +130,6 @@ fun NavigationHost(
                                         contentDescription = "navigate to ${screen.route}"
                                     )
                                 }
-
-//                                Text(
-//                                    text = screen.screenLabel!!,
-//                                    fontSize = 15.sp,
-//                                    color = MaterialTheme.colorScheme.primary
-//                                )
-
                             }
                         }
                     }
@@ -199,6 +192,10 @@ fun NavigationHost(
                 SearchUser(
                     searchUserViewModel = searchUserViewModel,
                     currentUserUid = currentUser.uid,
+                    friendsUIDList = currentUser.friends,
+                    sendFriendRequestAction = { friendUID->
+                        friendRequestsViewModel.sendFriendRequest(senderUid = currentUser.uid, receiverUid = friendUID)
+                    },
                     goToFriendProfile = {userUid ->
                         navController.navigate(Screen.FriendProfile.createRoute(userUid))
                     }
@@ -224,6 +221,7 @@ fun NavigationHost(
                     FriendProfileScreen(
                         friendUid = userUid,
                         currentUserUid = currentUser.uid,
+                        friendsUIDList = currentUser.friends,
                         sendFriendRequestAction = {
                             friendRequestsViewModel.sendFriendRequest(senderUid = currentUser.uid, receiverUid = userUid)
                         }

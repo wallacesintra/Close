@@ -23,6 +23,7 @@ fun FriendsLocationListComponents(
                 friend.locationCoordinates!!.locationDetail.latitude,
                 friend.locationCoordinates.locationDetail.longitude
             )
+
             FriendLocationComponent(
                 friendName = friend.closerUser.username,
                 friendProfileImg = profileImagesMap[friend.closerUser.profileImg]!!.imgResId,

@@ -3,6 +3,7 @@ package com.example.close.data.messaging
 import android.util.Log
 import com.example.close.data.messaging.models.CloseChatRoom
 import com.example.close.data.messaging.models.CloseMessage
+import com.example.close.presentation.messaging.models.MessageUI
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.toObject
@@ -22,7 +23,6 @@ class CloseMessagingDataSource(
 ): CloseMessaging {
 
     private val closeChatsCollection = "CloseChats"
-
 
     override suspend fun createChatRoom(closeChatRoom: CloseChatRoom) {
         val deferred = CompletableDeferred<Unit>()
@@ -109,6 +109,32 @@ class CloseMessagingDataSource(
             }
         }
 
+    override suspend fun deleteMessage(roomUid: String, message: MessageUI) {
+        val deferred = CompletableDeferred<Unit>()
+
+        val messageToDelete = hashMapOf(
+            "messageUid" to message.messageUid,
+            "senderUid" to message.sender.uid,
+            "message" to message.message,
+//            "timeStamp" to FieldValue.serverTimestamp(),
+        )
+
+        firestoreDb.collection(closeChatsCollection).document(roomUid)
+            .update("messages", FieldValue.arrayRemove(messageToDelete))
+            .addOnSuccessListener {
+                Log.d("deleting message", "successful")
+                deferred.complete(Unit)
+            }
+            .addOnFailureListener { e->
+                Log.w("deleting message", "failed $e")
+                deferred.completeExceptionally(e)
+            }
+
+        withContext(Dispatchers.IO){
+            deferred.await()
+        }
+    }
+
     override suspend fun getChatRoomMessages(chatRoomUid: String): Flow<List<CloseMessage>> =
         callbackFlow {
             val listener = firestoreDb.collection(closeChatsCollection)
@@ -125,6 +151,9 @@ class CloseMessagingDataSource(
 
                     trySend(textMessages.messages)
                 }
-        awaitClose { listener.remove() } // Detach the listener when the flow collector is done
+
+        awaitClose { listener.remove() }
     }
+
+
 }

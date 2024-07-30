@@ -11,9 +11,9 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.close.CloseApp
-import com.example.close.data.database.CloseUserDataSource
 import com.example.close.data.messaging.CloseMessagingDataSource
 import com.example.close.data.messaging.models.CloseChatRoom
+import com.example.close.data.users.CloseUserDataSource
 import com.example.close.presentation.friends.models.CloseFriendRequest
 import com.example.close.presentation.friends.models.FriendRequestsState
 import kotlinx.coroutines.Dispatchers
@@ -54,10 +54,12 @@ class FriendRequestsViewModel(
 
 
     fun getCurrentUserFriendRequests(currentUserUid: String){
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(Dispatchers.Main) {
 
             try {
+
                 friendRequestsState = FriendRequestsState.Loading
+
 
                 val requestList = closeUserDataSource.getFriendRequests(receiverUid = currentUserUid)
 

@@ -109,7 +109,7 @@ fun SignUp(
                 text = stringResource(id = R.string.register),
                 fontSize = 30.sp,
                 fontWeight = FontWeight.W700,
-                color = MaterialTheme.colorScheme.primary
+                color = MaterialTheme.colorScheme.secondary
             )
             Text(
                 text = stringResource(id = R.string.create_account),
@@ -275,9 +275,9 @@ fun SignUp(
                     if (correctEmailFormat && passwordsMatch && username != ""){
                         authViewModel.createNewAccountWithEmailAndPassword(username, email, password)
 
-                        if (authViewModel.authState.isUserSignedIn){
-                            goToSignIn()
-                        }
+//                        if (authViewModel.authState.){
+//                            goToSignIn()
+//                        }
 
                     }
 
@@ -307,7 +307,7 @@ fun SignUp(
                     text = stringResource(id = R.string.sign_in),
                     textDecoration = TextDecoration.Underline,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary,
+                    color = MaterialTheme.colorScheme.tertiary,
                     modifier = Modifier.clickable(
                         onClick = goToSignIn
                     )

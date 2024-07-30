@@ -10,8 +10,8 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.close.CloseApp
-import com.example.close.data.database.CloseUserDataSource
-import com.example.close.data.database.models.CloseUser
+import com.example.close.data.users.CloseUserDataSource
+import com.example.close.data.users.models.CloseUser
 import com.example.close.presentation.friends.models.CloseUserState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -38,6 +38,7 @@ class CloseUserViewModel(
                             uid = details.uid,
                             username = details.username,
                             bio = details.bio,
+                            profileImg = details.profileImg,
                             sharingLocation = details.sharingLocation
                         )
                     )
