@@ -4,6 +4,7 @@ plugins {
     id("com.google.gms.google-services")
     id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
     id("org.jetbrains.kotlin.plugin.serialization") version "1.9.10"
+    id("com.google.firebase.appdistribution") version "5.1.1" apply false
 }
 
 android {
