@@ -5,5 +5,7 @@ data class LocationDetail (
 //    val latitude: Double = 0.0,
 //    val longitude: Double = 0.0
 
-    val locationDetail: LocationModel = LocationModel()
+//    val locationDetail: LocationModel? = LocationModel()
+    val locationDetail: LocationModel? = null
+
 )

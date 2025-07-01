@@ -57,4 +57,11 @@
 
     <string name="turn_on_location">Turn on Location</string>
 
+    <string name="all_friends">All my Friends</string>
+    <string name="all_friends_except">All my Friends except…</string>
+    <string name="only_friends">Only share with…</string>
+    <string name="who_can_see">Who can see your location: </string>
+    <string name="share_location">Share Location</string>
+    <string name="setting">Setting</string>
+
 </resources>

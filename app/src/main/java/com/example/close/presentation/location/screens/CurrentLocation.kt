@@ -1,6 +1,7 @@
 package com.example.close.presentation.location.screens
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -17,6 +18,7 @@ import com.example.close.data.location.model.LocationModel
 import com.example.close.data.users.models.CloseUserData
 import com.example.close.presentation.components.Loading
 import com.example.close.presentation.location.components.FriendsLocationListComponents
+import com.example.close.presentation.location.components.LocationSettingBtn
 import com.example.close.presentation.location.components.MapView
 import com.example.close.presentation.location.components.TurnOnLocation
 import com.example.close.presentation.location.models.LocationState
@@ -34,16 +36,21 @@ fun CurrentLocation(
     currentUser: CloseUserData,
     locationViewModel: LocationViewModel
 ){
+    val context = LocalContext.current
+
     val locationState = locationViewModel.locationState
 
     val sharingState = locationViewModel.sharingState
 
     LaunchedEffect(key1 = Unit) {
-        locationViewModel.getCurrentLocation()
         locationViewModel.getFriendsLocationDetails(friendsLIst = friendsList)
+        locationViewModel.getCurrentLocation()
     }
 
-    val context = LocalContext.current
+    var sharingLocation by remember {
+        mutableStateOf(true)
+    }
+
     val isLocationEnabled = LocationSetting().isLocationEnabled(context = context)
 
     if (!isLocationEnabled){
@@ -61,10 +68,10 @@ fun CurrentLocation(
                 longitude = locationState.locationDetails.long
             )
 
-            locationViewModel.updateLocationDetails(
-                userUID = currentUser.uid,
-                locationDetail = currentLocation
-            )
+//            locationViewModel.updateLocationDetails(
+//                userUID = currentUser.uid,
+//                locationDetail = currentLocation
+//            )
             
             when(sharingState){
                 is SharingState.Error -> {
@@ -86,22 +93,45 @@ fun CurrentLocation(
                         )
 
                         Box(
-                            modifier = Modifier.align(Alignment.TopCenter)
+                            modifier = Modifier.align(Alignment.TopEnd)
                         ) {
-                            FriendsLocationListComponents(
-                                friendsList = sharingState.friendsLocationList,
-                                onFriendComponentClick = { friendLocation ->
-                                    cameraPositionState = CameraPositionState(
-                                        position = CameraPosition.fromLatLngZoom(
-                                            friendLocation,
-                                            19f
-                                        )
-                                    )
-                                },
-                                modifier = Modifier.padding(vertical = 8.dp)
-                            )
-                        }
+                            Column {
+                                FriendsLocationListComponents(
+                                    friendsList = sharingState.friendsLocationList,
+                                    onFriendComponentClick = { friendLocation ->
+                                        cameraPositionState = CameraPositionState(
 
+                                            position = CameraPosition.fromLatLngZoom(
+                                                friendLocation,
+                                                19f
+                                            )
+
+                                        )
+                                    },
+                                    modifier = Modifier.padding(vertical = 8.dp)
+                                )
+
+                                LocationSettingBtn(
+                                    isSharingLocation = sharingLocation,
+                                    sharingLocation = {
+
+                                        if (sharingLocation){
+                                            locationViewModel.updateLocationDetails(
+                                                userUID = currentUser.uid,
+                                                locationDetail = currentLocation
+                                            )
+                                        }else {
+                                            locationViewModel.updateLocationDetails(
+                                                userUID = currentUser.uid,
+                                                locationDetail = null
+                                            )
+                                        }
+
+                                    }
+                                )
+
+                            }
+                        }
                     }
                 }
             }

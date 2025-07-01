@@ -58,6 +58,7 @@ class CloseUserDataSource(
                     Log.d("get signed user", "fetch successful ${userData!!.email}")
                     trySend(userData)
                 }
+            
             awaitClose {listener.remove()}
     }
 

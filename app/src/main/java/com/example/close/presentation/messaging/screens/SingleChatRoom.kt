@@ -21,7 +21,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -34,31 +33,30 @@ import com.example.close.R
 import com.example.close.presentation.components.LargeText
 import com.example.close.presentation.components.MediumText
 import com.example.close.presentation.messaging.components.ChatBubble
-import com.example.close.presentation.messaging.viewmodel.MessagingViewModel
+import com.example.close.presentation.messaging.viewmodel.SingleChatRoomViewModel
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun SingleChatRoom(
     chatRoomUid: String,
     currentUserUid: String,
-    messagingViewModel: MessagingViewModel
+//    messagingViewModel: MessagingViewModel,
+    singleChatRoomViewModel: SingleChatRoomViewModel
 ) {
-    val messageText by messagingViewModel.messageText.collectAsState()
+//    val messageText by messagingViewModel.messageText.collectAsState()
+    val messageText by singleChatRoomViewModel.messageText.collectAsState()
+
+//    val messages by messagingViewModel.messages.collectAsState()
+    val messages by singleChatRoomViewModel.messages.collectAsState()
 
     val listState = rememberLazyListState()
 
     LaunchedEffect(key1 = true) {
-        messagingViewModel.setChatRoomUID(chatRoomUID = chatRoomUid)
+        singleChatRoomViewModel.setChatRoomUID(chatRoomUID = chatRoomUid)
         listState.scrollToItem(index = 0)
     }
 
-    DisposableEffect(true) {
-        onDispose {
-            messagingViewModel.resetChatRoomUID()
-        }
-    }
-
-    val showMessageList by messagingViewModel.showMessageList.collectAsState()
+    val showMessageLIst by singleChatRoomViewModel.showMessageList.collectAsState()
 
     Box(modifier = Modifier.fillMaxHeight()) {
         Column(
@@ -73,7 +71,7 @@ fun SingleChatRoom(
             )
 
             
-            if (showMessageList.messageList.isEmpty()){
+            if (showMessageLIst.messageList.isEmpty()){
                 MediumText(
                     text = stringResource(id = R.string.say_hi),
                     modifier = Modifier
@@ -89,14 +87,16 @@ fun SingleChatRoom(
                     .padding(bottom = 70.dp)
             ) {
                 items(
-                    items = showMessageList.messageList,
+                    items = showMessageLIst.messageList,
+//                    items = messages,
                     key = { message -> message.messageUid }
                 ){ message ->
                     ChatBubble(
                         currentUserUid = currentUserUid,
                         messageUI = message,
                         deleteMessage = {
-                            messagingViewModel.deleteMessage(roomUid = chatRoomUid, message = message)
+                            singleChatRoomViewModel.deleteMessage(roomUid = chatRoomUid, message = message)
+//                            messagingViewModel.deleteMessage(roomUid = chatRoomUid, message = message)
                         }
                     )
                 }
@@ -118,17 +118,24 @@ fun SingleChatRoom(
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent
                 ),
-                onValueChange = messagingViewModel::messageTextChange,
+//                onValueChange = messagingViewModel::messageTextChange,
+                onValueChange = singleChatRoomViewModel::messageTextChange,
                 trailingIcon = {
                     IconButton(
                         modifier = Modifier.padding(4.dp),
                         onClick = {
                             if (messageText.isNotEmpty()) {
-                                messagingViewModel.sendMessage(
+
+                                singleChatRoomViewModel.sendMessage(
                                     roomUid = chatRoomUid,
-                                    senderUid = currentUserUid,
+                                    senderUid = currentUserUid ,
                                     textMessage = messageText
                                 )
+//                                messagingViewModel.sendMessage(
+//                                    roomUid = chatRoomUid,
+//                                    senderUid = currentUserUid,
+//                                    textMessage = messageText
+//                                )
                             }
 
 
@@ -147,7 +154,7 @@ fun SingleChatRoom(
                     }
                 },
                 modifier = Modifier
-                    .padding(vertical=10.dp)
+                    .padding(vertical = 10.dp)
                     .fillMaxWidth(1.00f)
             )
 

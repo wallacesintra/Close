@@ -46,6 +46,7 @@ import com.example.close.presentation.location.viewmodel.LocationViewModel
 import com.example.close.presentation.messaging.screens.MessageScreen
 import com.example.close.presentation.messaging.screens.SingleChatRoom
 import com.example.close.presentation.messaging.viewmodel.MessagingViewModel
+import com.example.close.presentation.messaging.viewmodel.SingleChatRoomViewModel
 import com.example.close.presentation.profile.screens.EditProfileScreen
 import com.example.close.presentation.profile.screens.ProfileScreen
 import com.example.close.presentation.profile.viewmodels.CurrentUserProfileDetailsViewModel
@@ -85,6 +86,9 @@ fun NavigationHost(
 
     //messaging viewmodel
     val messagingViewModel: MessagingViewModel = viewModel(factory = MessagingViewModel.Factory)
+
+    //single chat view model
+    val singleChatRoomViewModel: SingleChatRoomViewModel = viewModel(factory = SingleChatRoomViewModel.Factory)
 
     Scaffold(
 
@@ -259,8 +263,10 @@ fun NavigationHost(
                 SingleChatRoom(
                     chatRoomUid = chatRoomUID!!,
                     currentUserUid = currentUser.uid,
-                    messagingViewModel = messagingViewModel
+//                    messagingViewModel = messagingViewModel,
+                    singleChatRoomViewModel = singleChatRoomViewModel
                 )
+
             }
         }
     }
