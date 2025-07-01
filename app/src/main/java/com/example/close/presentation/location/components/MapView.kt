@@ -66,7 +66,7 @@ fun MapView(
 
             friendListCoordinates.forEach { location ->
 
-                val friendLocation = location.locationCoordinates?.let { LatLng(it.locationDetail.latitude, location.locationCoordinates.locationDetail.longitude) }
+                val friendLocation = location.locationCoordinates?.let { LatLng(it.locationDetail!!.latitude, location.locationCoordinates.locationDetail!!.longitude) }
 
                 val friendIconMarker = bitImageConverter.getBitmapDescriptorFromBitmap(
                     context = context,

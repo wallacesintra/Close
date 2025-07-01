@@ -22,7 +22,6 @@ import com.example.close.presentation.location.models.LocationState
 import com.example.close.presentation.location.models.SharingState
 import com.example.close.utils.CryptoManager
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
@@ -91,45 +90,29 @@ class LocationViewModel(
      * @param userUID : current user uid
      * @param locationDetail: location latitude and longitude
      */
-    fun updateLocationDetails(userUID: String, locationDetail: LocationModel){
+    fun updateLocationDetails(userUID: String, locationDetail: LocationModel?){
         viewModelScope.launch(Dispatchers.IO){
-            delay(500)
+//            delay(500)
 
-            Log.d("encrypt data", "real data : ${locationDetail.latitude}")
-            val (encryptedLatitude, lat_iv) = cryptoManager.encryptDouble(locationDetail.latitude)
-
-            Log.d("iv latitude", lat_iv)
-            val (encryptedLongitude, long_iv) = cryptoManager.encryptDouble(locationDetail.longitude)
-
-            val latitudePairing = Pair(encryptedLatitude, lat_iv)
-            val longitudePairing = Pair(encryptedLongitude, long_iv)
-
-//            Log.d("encrypt data", "decrypted data: $encryptedLatitude$iv")
-            Log.d("encrypt data", "decrypted data: $latitudePairing")
-
-//            Log.d("encrypt data", "encrypted data: ${cryptoManager.decryptDouble(encryptedLatitude, iv)}")
-            Log.d("encrypt data", "encrypted data: ${cryptoManager.decryptDouble(latitudePairing.first, latitudePairing.second)}")
+//            Log.d("encrypt data", "real data : ${locationDetail.latitude}")
+//            val (encryptedLatitude, lat_iv) = cryptoManager.encryptDouble(locationDetail.latitude)
+//
+//            Log.d("iv latitude", lat_iv)
+//            val (encryptedLongitude, long_iv) = cryptoManager.encryptDouble(locationDetail.longitude)
+//
+//            val latitudePairing = Pair(encryptedLatitude, lat_iv)
+//            val longitudePairing = Pair(encryptedLongitude, long_iv)
+//
+//            Log.d("encrypt data", "decrypted data: $latitudePairing")
+//
+////            Log.d("encrypt data", "encrypted data: ${cryptoManager.decryptDouble(encryptedLatitude, iv)}")
+//            Log.d("encrypt data", "encrypted data: ${cryptoManager.decryptDouble(latitudePairing.first, latitudePairing.second)}")
 
 
             locationDataSource.setLocationDetail(
                 userUID = userUID,
                 locationDetail = locationDetail
             )
-
-//            val newLocationEncrypted = LocationModelEncrypted(
-//                latitude = encryptedLatitude,
-//                latitudeIv = lat_iv,
-//                longitude = encryptedLongitude,
-//                longitudeIv = long_iv
-////                latitude = latitudePairing,
-////                longitude = longitudePairing
-//            )
-
-
-//            locationDataSource.setLocationDetailEncrypted(
-//                userUID = userUID,
-//                locationDetail =newLocationEncrypted
-//            )
         }
     }
 
@@ -182,63 +165,34 @@ class LocationViewModel(
     fun getFriendsLocationDetails(friendsLIst: List<String>) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
+
                 val currentUserLocation = locationDataSource.fetchCurrentLocation().first()
-
-
 
                 val friendsLocationList = mutableListOf<FriendLocation>()
 
                 friendsLIst.forEach { friendUID ->
+
                     val locationDetail = locationDataSource.getLocationByUserUID(userUID = friendUID)
-//                    val locationDetail = locationDataSource.getEncryptedLocationByUser(userUID = friendUID)
 
-//                    lateinit var locationInfo: LocationDetail
-
-//                    val locationInfo = LocationDetail(
-//                        locationDetail = LocationModel(
-//                            latitude = cryptoManager.decryptDouble(locationDetail.locationDetail!!.latitude, locationDetail.locationDetail.latitudeIv),
-//                            longitude = cryptoManager.decryptDouble(locationDetail.locationDetail.longitude, locationDetail.locationDetail.longitudeIv)
-//                        )
-//                    )
-//                     locationDataSource.getEncryptedLocationOfUserUIDFlow(userUID = friendUID).collect { encryptedLocation ->
-//
-//                         Log.d("encrypted location flow", encryptedLocation.locationDetail!!.latitude)
-//                        locationInfo = LocationDetail(
-////                            lat = cryptoManager.decryptDouble(encryptedLocation.locationDetail.latitude!!.first, encryptedLocation.locationDetail.latitude.second),
-////                            long = cryptoManager.decryptDouble(encryptedLocation.locationDetail.longitude!!.first, encryptedLocation.locationDetail.longitude.second)
-//                            locationDetail = LocationModel(
-//                                latitude = cryptoManager.decryptDouble(encryptedLocation.locationDetail!!.latitude, encryptedLocation.locationDetail.latitudeIv),
-////                                latitude = cryptoManager.decryptDouble(encryptedLocation.locationDetail!!.latitude.first, encryptedLocation.locationDetail.latitude.second),
-//                                longitude = cryptoManager.decryptDouble(encryptedLocation.locationDetail.longitude, encryptedLocation.locationDetail.longitudeIv)
-////                                longitude = cryptoManager.decryptDouble(encryptedLocation.locationDetail.longitude.first, encryptedLocation.locationDetail.longitude.second)
-//                            )
-//                        )
-//                    }
-
-
-//                    val user = closeUserDataSource.getCloseUserByUid(closeUid = friendUID)
-                    val distance = calculateDistance(
-                        lat1 = currentUserLocation.latitude,
-                        lon1 = currentUserLocation.longitude,
-//                        lat2 = locationInfo.locationDetail.latitude,
-//                        lon2 = locationInfo.locationDetail.longitude
-                        lat2 = locationDetail.locationDetail.latitude,
-                        lon2 = locationDetail.locationDetail.longitude
-                    )
-
-
-                    Log.d("Getting Location detail", "location from $locationDetail")
-//                    Log.d("Getting Location detail", "location from ${locationInfo.locationDetail}")
-
-
-                    friendsLocationList.add(
-                        FriendLocation(
-                            closerUser = closeUserDataSource.getCloseUserByUid(closeUid = friendUID),
-                            locationCoordinates = locationDataSource.getLocationByUserUID(userUID = friendUID),
-//                            locationCoordinates = locationInfo,
-                            distanceBetweenCurrentUserLocation = distance
+                    if (locationDetail.locationDetail != null){
+                        val distance = calculateDistance(
+                            lat1 = currentUserLocation.latitude,
+                            lon1 = currentUserLocation.longitude,
+                            lat2 = locationDetail.locationDetail.latitude,
+                            lon2 = locationDetail.locationDetail.longitude
                         )
-                    )
+
+
+                        Log.d("Getting Location detail", "location from $locationDetail")
+
+                        friendsLocationList.add(
+                            FriendLocation(
+                                closerUser = closeUserDataSource.getCloseUserByUid(closeUid = friendUID),
+                                locationCoordinates = locationDetail,
+                                distanceBetweenCurrentUserLocation = distance
+                            )
+                        )
+                    }
                 }
 
                 Log.d("LocationSharing", "Successfully received ${friendsLocationList.size} locations")

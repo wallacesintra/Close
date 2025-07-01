@@ -13,7 +13,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.close.presentation.components.MediumText
@@ -63,7 +62,8 @@ fun ChatRoomContainer(
                 )
                 MediumText(
                     text = if (closeChatRoomUi.messages.isEmpty()) "start a conversation" else closeChatRoomUi.messages.last().message ,
-                    modifier = Modifier.alpha(0.5f)
+                    modifier = Modifier
+//                        .alpha(0.5f)
                 )
             }
         }

@@ -7,5 +7,7 @@ data class CloseUserData(
     val bio: String = "Close is bringing me closer to you",
     val profileImg: String = "female_dp",
     val friends: List<String> = emptyList(),
+    val sharingLocationList: List<String> = emptyList(),
+    val receivingLocation: List<String> = emptyList(),
     var shareLocation: Boolean = false,
 )

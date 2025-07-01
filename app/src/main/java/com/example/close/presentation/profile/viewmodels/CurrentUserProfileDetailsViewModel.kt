@@ -39,7 +39,6 @@ class CurrentUserProfileDetailsViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 detailsState = DetailsState.Loading
-
                 val deferred = friendsList.map { uid ->
                     async {
                         Log.d("get friends", "successful $uid")

@@ -23,7 +23,7 @@ interface LocationSource {
 
     suspend fun getLocationByUserUID(userUID: String): LocationDetail
 
-    suspend fun setLocationDetail(userUID: String, locationDetail: LocationModel)
+    suspend fun setLocationDetail(userUID: String, locationDetail: LocationModel?)
 
     suspend fun setLocationDetailEncrypted(userUID: String, locationDetail: LocationModelEncrypted)
 
@@ -34,4 +34,7 @@ interface LocationSource {
     suspend fun getEncryptedLocationByUser(userUID: String): LocationDetailEncrypted
 
     suspend fun getEncryptedLocationOfUserUIDFlow(userUID: String): Flow<LocationDetailEncrypted>
+
+    suspend fun updatingLocationSendingList(userUID: String, friendsList: List<String>)
+
 }

@@ -20,8 +20,8 @@ fun FriendsLocationListComponents(
         items(friendsList){friend ->
 
             val friendPresentLocation = LatLng(
-                friend.locationCoordinates!!.locationDetail.latitude,
-                friend.locationCoordinates.locationDetail.longitude
+                friend.locationCoordinates!!.locationDetail!!.latitude,
+                friend.locationCoordinates.locationDetail!!.longitude
             )
 
             FriendLocationComponent(

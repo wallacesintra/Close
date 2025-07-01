@@ -35,6 +35,39 @@ class MessagingViewModel(
     private val closeMessagingDataSource: CloseMessagingDataSource,
     private val closeUserDataSource: CloseUserDataSource
 ): ViewModel() {
+    private val _messages = MutableStateFlow<List<MessageUI>>(emptyList())
+
+    val messages = _messages.asStateFlow()
+
+    override fun onCleared() {
+        super.onCleared()
+        resetChatRoomUID()
+    }
+
+//    init {
+//        viewModelScope.launch {
+//
+//            val chatUID = savedStateHandle.get<String>("chatRoomUID")
+//            val messages = mutableListOf<MessageUI>()
+//
+//            closeMessagingDataSource.getChatRoomMessages(chatUID!!).collect{ chat->
+//                chat.forEach { item ->
+//                    messages.add(
+//                        MessageUI(
+//                            message = item.message,
+//                            messageUid = item.messageUid,
+//                            sender = closeUserDataSource.getCloseUserByUid(item.senderUid)
+//                        )
+//                    )
+//                }
+//
+//            }
+//
+//            _messages.update { messages }
+//
+//        }
+//
+//    }
 
     private val _messageText = MutableStateFlow("")
     val messageText = _messageText.asStateFlow()
@@ -46,7 +79,7 @@ class MessagingViewModel(
         savedStateHandle["chatRoomUID"] = chatRoomUID
     }
 
-    fun resetChatRoomUID(){
+    private fun resetChatRoomUID(){
         savedStateHandle["chatRoomUID"] = ""
     }
 
@@ -71,6 +104,7 @@ class MessagingViewModel(
     private val _messageListState = MutableStateFlow(MessageListUI())
 
     val showMessageList = combine(_messageListState, _showMessages, _showMessageList){ state, _, list ->
+
         val messageList = mutableListOf<MessageUI>()
 
         for (i in list.reversed()){

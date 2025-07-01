@@ -8,7 +8,7 @@ fun Context.shareMessage(sender: String, message: String){
     val sendIntent = Intent(
         Intent.ACTION_SEND
     ).apply {
-        putExtra(Intent.EXTRA_TEXT, "${sender}: $message")
+        putExtra(Intent.EXTRA_TEXT, message)
         type = "text/plain"
     }
     val shareIntent = Intent.createChooser(

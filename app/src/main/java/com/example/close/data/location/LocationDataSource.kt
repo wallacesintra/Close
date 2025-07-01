@@ -41,6 +41,8 @@ class LocationDataSource(
 
     private val closeLocationCollection = "CloseLocationCollection"
 
+    private val closeLocationSharingList = "CloseLocationSharingList"
+
 
     override suspend fun fetchCurrentLocation(): Flow<LocationModel> {
         return callbackFlow {
@@ -216,15 +218,17 @@ class LocationDataSource(
             .addOnSuccessListener { documentSnapshot ->
                 if (documentSnapshot.exists()) {
                     val location = documentSnapshot.toObject<LocationDetail>()
-                    if (location != null) {
-                        Log.d("User current location now", "$location")
-                        deferred.complete(location)
-                    } else {
-                        Log.w("User current location now", "Location data is null")
-                        deferred.completeExceptionally(
-                            KotlinNullPointerException("Location data is null")
-                        )
-                    }
+                    Log.d("User current location now", "$location")
+                    deferred.complete(location!!)
+//                    if (location != null) {
+//                        Log.d("User current location now", "$location")
+//                        deferred.complete(location)
+//                    } else {
+//                        Log.w("User current location now", "Location data is null")
+//                        deferred.completeExceptionally(
+//                            KotlinNullPointerException("Location data is null")
+//                        )
+//                    }
                 } else {
                     Log.w("User current location now", "Document does not exist")
                     deferred.completeExceptionally(
@@ -244,7 +248,7 @@ class LocationDataSource(
 
     override suspend fun setLocationDetail(
         userUID: String,
-        locationDetail: LocationModel
+        locationDetail: LocationModel?
     ) {
         if (userUID.isBlank()){
             return
@@ -386,9 +390,7 @@ class LocationDataSource(
     override suspend fun getEncryptedLocationOfUserUIDFlow(userUID: String): Flow<LocationDetailEncrypted> =
         callbackFlow{
             val listener = firestoreDB.collection(closeLocationCollection)
-
                 .document(userUID)
-
                 .addSnapshotListener { value, error ->
                     if (error != null){
                         close()
@@ -403,4 +405,10 @@ class LocationDataSource(
 
             awaitClose { listener.remove() }
     }
+
+    override suspend fun updatingLocationSendingList(userUID: String, friendsList: List<String>) {
+        TODO("Not yet implemented")
+    }
+
+
 }
