@@ -18,3 +18,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "Close"
 include(":app")
+include(":shared")
